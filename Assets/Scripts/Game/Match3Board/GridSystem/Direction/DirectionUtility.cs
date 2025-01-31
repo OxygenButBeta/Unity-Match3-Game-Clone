@@ -17,7 +17,6 @@ namespace O2.Grid
         static DirectionUtility() =>
             AllDirections = new[] { Direction.Left, Direction.Right, Direction.Up, Direction.Down };
 
-
         /// <summary>
         /// Converts a Vector2Int to a Direction.
         /// </summary>

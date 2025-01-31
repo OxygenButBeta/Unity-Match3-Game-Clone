@@ -24,8 +24,8 @@ namespace Match3
         /// <summary>
         /// The method that will be called when a move is executed.
         /// </summary>
-        /// <param name="boardActionMove"></param>
-        public virtual void ExecuteMove(BoardActionMove boardActionMove)
+        /// <param name="boardSwipeActionData"></param>
+        public virtual void ExecuteMove(BoardSwipeActionData boardSwipeActionData)
         {
             // This method will be overridden by the child classes.
         }

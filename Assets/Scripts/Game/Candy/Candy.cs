@@ -7,6 +7,7 @@ namespace Match3
         public ScriptableCandy scriptableCandy;
         public SpriteRenderer image;
 
+        public bool IsExploded;
         public void SetScriptableCandy(ScriptableCandy scriptableCandy)
         {
             this.scriptableCandy = scriptableCandy;

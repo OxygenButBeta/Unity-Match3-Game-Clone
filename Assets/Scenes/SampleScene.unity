@@ -20,12 +20,12 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 1, g: 1, b: 1, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 3
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SubtractiveShadowColor: {r: 1, g: 1, b: 1, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 3a759645627e55948945e49928fd0aac, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -340,29 +340,24 @@ MonoBehaviour:
   cellSize: 0.7
   origin: {x: -1.75, y: -5}
   checkNeighbours: 1
+  _boardMoveActionValidators:
+  - rid: 7478115733003305032
   scriptableCandies:
-  - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
-  - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
+  - {fileID: 11400000, guid: 556fa891bd7be964cae9da33a343aae0, type: 2}
   - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
   - {fileID: 11400000, guid: f04ab0b3da462f34480656ef0fbd7c1d, type: 2}
   - {fileID: 11400000, guid: 1ddb27c135ab02f4eb22eabf14bf8f77, type: 2}
   - {fileID: 11400000, guid: 32fbf8f990991864fbc729b32dae7060, type: 2}
   - {fileID: 11400000, guid: 7b40b1dd625bae64da23886633e75832, type: 2}
-  - {fileID: 11400000, guid: 09f16cdc7cf391f4ca9732273547da0f, type: 2}
-  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
-  - {fileID: 11400000, guid: 90bbe1218f5cebc42bf1c8c938e6b97c, type: 2}
-  - {fileID: 11400000, guid: 04d66a8014c71f64fa70ce230c882b91, type: 2}
-  - {fileID: 11400000, guid: 7a17404b7f181c344b747f1f211f7986, type: 2}
-  - {fileID: 11400000, guid: a7a96a03e31e6fa40a0d79d081ef6a39, type: 2}
-  - {fileID: 11400000, guid: e8760e30a17075541a08cf6f0052b236, type: 2}
   - {fileID: 11400000, guid: 3477b6ca4558c4c488eace14b94c1136, type: 2}
-  - {fileID: 11400000, guid: 6cbd42333787c7f45b0df117e97c8f7a, type: 2}
-  - {fileID: 11400000, guid: 366c0859aac426a48bcdd2c27f527c43, type: 2}
-  - {fileID: 11400000, guid: 31e70810de49b9b40899148e25f18f86, type: 2}
-  - {fileID: 11400000, guid: 2cb73f61f79fad8499e62b6fd6d763ef, type: 2}
-  - {fileID: 11400000, guid: 5d0fe9f89eb9096459e15d75f670b362, type: 2}
-  - {fileID: 11400000, guid: 556fa891bd7be964cae9da33a343aae0, type: 2}
+  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
   prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7478115733003305032
+      type: {class: PositionToIndexValidator, ns: Match3, asm: O2.GridBasedBoard}
+      data: 
 --- !u!4 &965410005
 Transform:
   m_ObjectHideFlags: 0
@@ -578,7 +573,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_Sprite: {fileID: -8791783539896231373, guid: 14a8f23e2fc3fa24a80ba193ea0e5ed7, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.56078434}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
