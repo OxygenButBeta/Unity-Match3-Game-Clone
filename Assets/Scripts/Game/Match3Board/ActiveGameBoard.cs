@@ -14,7 +14,7 @@ namespace Match3{
         protected bool checkNeighbours = true;
 
         // The grid that represents the game board.
-        protected Grid<T> grid;
+        public Grid<T> grid;
 
         /// <summary>
         /// Validators to validate the move action.

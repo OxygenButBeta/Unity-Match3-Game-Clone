@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using O2.Grid;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Match3{
     public class Match3Board : ActiveGameBoard<Candy>{
         [SerializeField] ScriptableCandy[] scriptableCandies;
         [SerializeField] Candy prefab;
-
 
         Vector2Int dragStartIndex;
         Vector2Int dragEndIndex;
@@ -126,6 +128,35 @@ namespace Match3{
             return grid.GetGridElementIfIsNotDisabled(targetPosition + direction, out var gridItem) &&
                    gridItem.Item.scriptableCandy.Equals(element.Item.scriptableCandy);
         }
+
+        int FindMatchesOnGivenDirection(Vector2Int origin, Direction direction, int myOrder){
+            if (grid.TryToGetGridElementAt(origin + direction.ToVector2Int(), out var element)){
+                if (element.Item.scriptableCandy.Equals(grid.GetGridElementAt(origin).Item.scriptableCandy)){
+                    return FindMatchesOnGivenDirection(element.Index, direction, myOrder + 1);
+                }
+
+                return myOrder;
+            }
+
+            Matrix4x4 x = transform.localToWorldMatrix;
+            return myOrder;
+        }
+
+        bool IsMatchingWithNeighbor(GridElement<Candy> element, Direction from, out GridElement<Candy> neighbour){
+            foreach (Direction direction in DirectionUtility.AllDirections){
+                if (direction == from)
+                    continue;
+
+                if (grid.TryToGetGridElementAt(element.Index + from.ToVector2Int(), out neighbour)){
+                    if (neighbour.Item.scriptableCandy.Equals(element.Item.scriptableCandy))
+                        return true;
+                }
+            }
+
+            neighbour = null;
+            return false;
+        }
+
 
         IEnumerable<GridElement<Candy>> FindMatches(int matchLengthMin){
             var matches = new List<GridElement<Candy>>();

@@ -11,7 +11,7 @@ namespace O2.Grid{
     /// <typeparam name="T"></typeparam>
     public sealed class Grid<T> : WorldGrid{
         // The 2D array of GridElement.
-        internal readonly GridElement<T>[,] gridArray;
+        public readonly GridElement<T>[,] gridArray;
 
         //Constructor
         public Grid(int width, int height, float cellSize, Vector3 origin) : base(width, height, cellSize, origin){

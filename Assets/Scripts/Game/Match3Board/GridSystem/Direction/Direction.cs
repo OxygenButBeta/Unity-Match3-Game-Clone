@@ -9,5 +9,6 @@ namespace  O2.Grid
         Right,
         Up,
         Down,
+        None
     }
 }
