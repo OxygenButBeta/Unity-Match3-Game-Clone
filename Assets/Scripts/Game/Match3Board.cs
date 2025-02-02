@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using O2.Grid;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,10 +11,13 @@ namespace Match3{
     public class Match3Board : ActiveGameBoard<Candy>{
         [SerializeField] ScriptableCandy[] scriptableCandies;
         [SerializeField] Candy prefab;
+        [SerializeField, TabGroup("Game Options")] float fallDuration = 0.5f;
+        [SerializeField, TabGroup("Game Options")] bool allow2x2Matches = true;
 
         Vector2Int dragStartIndex;
         Vector2Int dragEndIndex;
         bool ignoreInput;
+        GridGravityOptions<Candy> gridGravityOptions;
 
         #region Trash
 
@@ -27,21 +30,21 @@ namespace Match3{
 
         #endregion
 
-        private void Awake(){
-            grid = new Grid<Candy>(width, height, cellSize, origin);
+
+        protected override void OnAwake(){
             foreach (var element in grid.IterateAll()){
                 element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform);
                 element.Item.SetScriptableCandy(scriptableCandies[Random.Range(0, scriptableCandies.Length)]);
             }
 
+            gridGravityOptions = new GridGravityOptions<Candy>(
+                (element) => element.Item.IsExploded,
+                (element) => element.Item.transform.DOMove(grid.GetWorldPosition(element), fallDuration)
+                    .SetEase(Ease.OutBack));
+
             SetCameraToCenter();
+            ProcessMatches().Forget();
         }
-
-        void SetTransform(GridElement<Candy> element){
-            element.Item.transform.DOMove(grid.GetWorldPosition(element), 0.5f).SetEase(Ease.OutBack);
-        }
-
-        bool IsCandyExploded(GridElement<Candy> element) => element.Item.IsExploded;
 
         protected override void ExecuteValidatedMove(GridElement<Candy> firstGridElement,
             GridElement<Candy> secondGridElement){
@@ -49,34 +52,53 @@ namespace Match3{
                 return;
 
             ignoreInput = true;
-            Swap(firstGridElement, secondGridElement).Forget();
+            ExecuteSwipe(firstGridElement, secondGridElement).Forget();
         }
 
-        async UniTaskVoid Swap(GridElement<Candy> firstGridElement, GridElement<Candy> secondGridElement){
-            await SwapWorldPosition(firstGridElement, secondGridElement);
-            if (!HasAnyNeighbour(firstGridElement, secondGridElement,
-                    DirectionUtility.GetRelativeDirection(secondGridElement, firstGridElement))){
-                await SwapWorldPosition(firstGridElement, secondGridElement);
+        async UniTaskVoid ExecuteSwipe(GridElement<Candy> firstGridElement, GridElement<Candy> secondGridElement){
+            // Swap the values and Swap in the visual
+            await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
+            grid.SwapValues(firstGridElement, secondGridElement);
+
+            HashSet<Vector2Int> matchResult = FindMatches();
+
+            // Swap back if no match
+            if (matchResult.Count == 0){
+                await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
+                grid.SwapValues(firstGridElement, secondGridElement);
                 ignoreInput = false;
                 return;
             }
 
-            grid.SwapValues(firstGridElement, secondGridElement);
-
-            FindMatchesEndExplode();
-            if (GridSystemHelper.SimulateGravity(grid, IsCandyExploded, SetTransform)){
-                FindMatchesEndExplode();
-            }
-
-            await SpawnNewCandies();
+            await ProcessMatches();
             ignoreInput = false;
         }
 
+        async UniTask ProcessMatches(){
+            while (true){
+                HashSet<Vector2Int> matchIndices = FindMatches();
+
+                if (matchIndices.Count == 0)
+                    break; // No more matches
+
+                await ExplodeMatches(matchIndices);
+
+                // Gravity Simulation
+                var hasFallen = GridSystemUtilities.SimulateGravity(grid, gridGravityOptions);
+
+                if (hasFallen)
+                    await UniTask.Delay(Convert.ToInt32(fallDuration * 1000)); // Wait for the fall to finish
+
+                await SpawnNewCandies();
+            }
+        }
+
         private async UniTask SpawnNewCandies(){
+            List<UniTask> spawnTasks = new();
+
             foreach (var element in grid.IterateAll(true)){
-                if (!element.IsStatic){
+                if (!element.IsStatic)
                     continue;
-                }
 
                 element.IsStatic = false;
                 element.Item.gameObject.SetActive(true);
@@ -85,134 +107,82 @@ namespace Match3{
                 element.Item.SetScriptableCandy(scriptableCandies[Random.Range(0, scriptableCandies.Length)]);
                 var pos = grid.GetWorldPosition(element);
                 element.Item.transform.position = new Vector3(pos.x, 10 + pos.y, pos.z);
-                await UniTask.Delay(30);
-                element.Item.transform.DOMove(pos, .6f).SetEase(Ease.InOutQuad);
+                spawnTasks.Add(element.Item.transform.DOMove(pos, .6f).SetEase(Ease.InOutQuad).ToUniTask());
             }
+
+            await UniTask.WhenAll(spawnTasks);
         }
 
-        void FindMatchesEndExplode(){
-            foreach (var gridItem in FindMatches(3)){
-                if (gridItem.IsStatic)
+        async UniTask ExplodeMatches(HashSet<Vector2Int> matchIndices){
+            List<UniTask> explodeTasks = new();
+            foreach (var gridItem in grid.GetGridElements(matchIndices)){
+                if (gridItem.IsStatic) // Don't explode static items
                     continue;
+                explodeTasks.Add(CreateAnim(gridItem));
+            }
 
+            await UniTask.WhenAll(explodeTasks);
+
+            Debug.Log("Exploded");
+
+            foreach (var gridItem in grid.GetGridElements(matchIndices)){
                 gridItem.IsStatic = true;
                 gridItem.Item.gameObject.SetActive(false);
+                gridItem.Item.transform.localScale = Vector3.one * .6f;
                 gridItem.Item.IsExploded = true;
                 gridItem.IsFilled = false;
             }
         }
 
-        async UniTask SwapWorldPosition(GridElement<Candy> start, GridElement<Candy> end){
-            start.Item.transform.DOMove(end.Item.transform.position, 0.5f).SetEase(Ease.OutBack);
-            end.Item.transform.DOMove(start.Item.transform.position, 0.5f).SetEase(Ease.OutBack);
-            await UniTask.Delay(500);
+        private UniTask CreateAnim(GridElement<Candy> gridItem){
+            return gridItem.Item.transform
+                .DOScale(0f, 0.3f)
+                .SetEase(Ease.InOutQuad).ToUniTask();
         }
 
-        bool HasAnyNeighbour(GridElement<Candy> element, Vector2Int targetPosition, Direction ignoreDirection){
-            foreach (Direction direction in DirectionUtility.AllDirections){
-                if (direction == ignoreDirection)
+
+        HashSet<Vector2Int> FindMatches(){
+            HashSet<Vector2Int> match = new();
+
+            for (int i = 0; i < width * height; i++){
+                var x = i % width;
+                var y = i / width;
+                GridElement<Candy> currentElement = grid.GetGridElementAt(x, y);
+
+                // Horizontal
+                if (x < width - 2 &&
+                    grid.GetGridElementAt(x + 1, y).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
+                    grid.GetGridElementAt(x + 2, y).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy)){
+                    match.Add(new Vector2Int(x, y));
+                    match.Add(new Vector2Int(x + 1, y));
+                    match.Add(new Vector2Int(x + 2, y));
+                }
+
+                // Vertical
+                if (y < height - 2 &&
+                    grid.GetGridElementAt(x, y + 1).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
+                    grid.GetGridElementAt(x, y + 2).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy)){
+                    match.Add(new Vector2Int(x, y));
+                    match.Add(new Vector2Int(x, y + 1));
+                    match.Add(new Vector2Int(x, y + 2));
+                }
+
+                // 2x2 Square
+                if (!allow2x2Matches)
                     continue;
-
-                if (IsMatchingWithNeighborAtPosition(element, targetPosition, direction.ToVector2Int()))
-                    return true;
-            }
-
-            return false;
-        }
-
-        bool IsMatchingWithNeighborAtPosition(GridElement<Candy> element, Vector2Int targetPosition,
-            Vector2Int direction){
-            if (!grid.IsIndexWithinBounds(targetPosition + direction))
-                return false;
-
-            return grid.GetGridElementIfIsNotDisabled(targetPosition + direction, out var gridItem) &&
-                   gridItem.Item.scriptableCandy.Equals(element.Item.scriptableCandy);
-        }
-
-        int FindMatchesOnGivenDirection(Vector2Int origin, Direction direction, int myOrder){
-            if (grid.TryToGetGridElementAt(origin + direction.ToVector2Int(), out var element)){
-                if (element.Item.scriptableCandy.Equals(grid.GetGridElementAt(origin).Item.scriptableCandy)){
-                    return FindMatchesOnGivenDirection(element.Index, direction, myOrder + 1);
-                }
-
-                return myOrder;
-            }
-
-            Matrix4x4 x = transform.localToWorldMatrix;
-            return myOrder;
-        }
-
-        bool IsMatchingWithNeighbor(GridElement<Candy> element, Direction from, out GridElement<Candy> neighbour){
-            foreach (Direction direction in DirectionUtility.AllDirections){
-                if (direction == from)
-                    continue;
-
-                if (grid.TryToGetGridElementAt(element.Index + from.ToVector2Int(), out neighbour)){
-                    if (neighbour.Item.scriptableCandy.Equals(element.Item.scriptableCandy))
-                        return true;
+                if (x < width - 1 && y < height - 1 &&
+                    grid.GetGridElementAt(x + 1, y).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
+                    grid.GetGridElementAt(x, y + 1).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
+                    grid.GetGridElementAt(x + 1, y + 1).Item.scriptableCandy
+                        .Equals(currentElement.Item.scriptableCandy)){
+                    match.Add(new Vector2Int(x, y));
+                    match.Add(new Vector2Int(x + 1, y));
+                    match.Add(new Vector2Int(x, y + 1));
+                    match.Add(new Vector2Int(x + 1, y + 1));
                 }
             }
 
-            neighbour = null;
-            return false;
-        }
-
-
-        IEnumerable<GridElement<Candy>> FindMatches(int matchLengthMin){
-            var matches = new List<GridElement<Candy>>();
-
-            for (var y = 0; y < height; y++){
-                var currentMatch = new List<GridElement<Candy>>();
-
-                for (var x = 0; x < width; x++){
-                    var current = grid.GetGridElementAt(x, y);
-                    if (current.IsStatic)
-                        continue;
-
-                    if (currentMatch.Count == 0 ||
-                        current.Item.scriptableCandy.Equals(currentMatch[0].Item.scriptableCandy)){
-                        currentMatch.Add(current);
-                    }
-                    else{
-                        if (currentMatch.Count >= matchLengthMin)
-                            matches.AddRange(currentMatch);
-
-                        currentMatch.Clear();
-                        currentMatch.Add(current);
-                    }
-                }
-
-                if (currentMatch.Count >= matchLengthMin)
-                    matches.AddRange(currentMatch);
-            }
-
-            for (var x = 0; x < width; x++){
-                var currentMatch = new List<GridElement<Candy>>();
-
-                for (var y = 0; y < height; y++){
-                    var current = grid.GetGridElementAt(x, y);
-                    if (current.IsStatic)
-                        continue;
-
-                    if (currentMatch.Count == 0 ||
-                        current.Item.scriptableCandy.Equals(currentMatch[0].Item.scriptableCandy)){
-                        currentMatch.Add(current);
-                    }
-                    else{
-                        if (currentMatch.Count >= matchLengthMin)
-                            matches.AddRange(currentMatch);
-
-                        currentMatch.Clear();
-                        currentMatch.Add(current);
-                    }
-                }
-
-                if (currentMatch.Count >= matchLengthMin)
-                    matches.AddRange(currentMatch);
-            }
-
-            return
-                matches;
+            return match;
         }
     }
 }

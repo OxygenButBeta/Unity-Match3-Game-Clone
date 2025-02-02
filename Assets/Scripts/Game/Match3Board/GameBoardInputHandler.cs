@@ -13,15 +13,13 @@ namespace Match3{
         [SerializeField] InputSystemUIInputModule inputSystemUiInputModule;
         [SerializeField] float AngleThresholdTolerance = 30f;
 
-        [SerializeField, Required, Tooltip("Listener")]
-        GameBoardBase gameBoardBase;
+        [SerializeField, Required, Tooltip("Listener")] GameBoardBase gameBoardBase;
 
         /// <summary>
         /// The start/End and end points of the swipe.
         /// Converted to world space.
         /// </summary>
         Vector2 startPoint, endPoint;
-
         Camera _mainCamera;
 
         private void Awake(){
@@ -47,7 +45,7 @@ namespace Match3{
         void OnPointerUp(InputAction.CallbackContext context){
             // Get the end point of the swipe and send the move to the game board.
             // Send the move to the game board.
-            gameBoardBase.ExecuteMove(new BoardSwipeActionData()
+            gameBoardBase.ExecuteMove(new SwipeActionData()
             {
                 startPositionScreenToWorld = startPoint,
                 DesignatedDirection =

@@ -285,10 +285,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf0d1116088e2943b5100d9f2741005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 6
-  height: 12
-  cellSize: 0.7
-  origin: {x: -1.75, y: -5}
+  <width>k__BackingField: 6
+  <height>k__BackingField: 12
+  <cellSize>k__BackingField: 0.7
+  <origin>k__BackingField: {x: -1.75, y: -5}
   blankPrefab: {fileID: 8374404814352255079, guid: a33d68ecee9a7464f84999a19c6874c5, type: 3}
 --- !u!4 &645238817
 Transform:
@@ -335,23 +335,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5c304de505b43c693b79c377b227c6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 6
-  height: 12
-  cellSize: 0.7
-  origin: {x: -1.75, y: -5}
+  <width>k__BackingField: 6
+  <height>k__BackingField: 12
+  <cellSize>k__BackingField: 0.7
+  <origin>k__BackingField: {x: -1.75, y: -5}
   checkNeighbours: 1
   _boardMoveActionValidators:
   - rid: 7478115733003305032
   scriptableCandies:
+  - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
+  - {fileID: 11400000, guid: 5d0fe9f89eb9096459e15d75f670b362, type: 2}
   - {fileID: 11400000, guid: 556fa891bd7be964cae9da33a343aae0, type: 2}
-  - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
-  - {fileID: 11400000, guid: f04ab0b3da462f34480656ef0fbd7c1d, type: 2}
-  - {fileID: 11400000, guid: 1ddb27c135ab02f4eb22eabf14bf8f77, type: 2}
-  - {fileID: 11400000, guid: 32fbf8f990991864fbc729b32dae7060, type: 2}
-  - {fileID: 11400000, guid: 7b40b1dd625bae64da23886633e75832, type: 2}
-  - {fileID: 11400000, guid: 3477b6ca4558c4c488eace14b94c1136, type: 2}
-  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
   prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
+  fallDuration: 0.5
+  allow2x2Matches: 1
   references:
     version: 2
     RefIds:

@@ -6,7 +6,7 @@ namespace Match3
     /// A Struct to represent a move on the board.
     /// It contains the start position of the move and the direction of the move.
     /// </summary>
-    public struct BoardSwipeActionData
+    public struct SwipeActionData
     {
         /// <summary>
         /// Start position of the move in screen space.

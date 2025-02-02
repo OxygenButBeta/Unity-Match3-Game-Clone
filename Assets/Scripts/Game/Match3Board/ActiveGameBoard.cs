@@ -10,8 +10,7 @@ namespace Match3{
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class ActiveGameBoard<T> : GameBoardBase{
-        [SerializeField, TabGroup("Validation Options")]
-        protected bool checkNeighbours = true;
+        [SerializeField, TabGroup("Validation Options")] protected bool checkNeighbours = true;
 
         // The grid that represents the game board.
         public Grid<T> grid;
@@ -28,7 +27,7 @@ namespace Match3{
         /// <param name="secondGridElement"></param>
         protected abstract void ExecuteValidatedMove(GridElement<T> firstGridElement, GridElement<T> secondGridElement);
 
-        public override void ExecuteMove(BoardSwipeActionData swipeActionData){
+        public override void ExecuteMove(SwipeActionData swipeActionData){
             if (_boardMoveActionValidators != null)
                 if (_boardMoveActionValidators.Any(validator => !validator.ValidateMoveAction(grid, swipeActionData)))
                     return;
@@ -40,14 +39,24 @@ namespace Match3{
                 grid.GetGridElementAt(firstGridElement.Index + swipeActionData.DesignatedDirection);
 
 
-            if (!secondGridElement.IsFilled){
+            if (!secondGridElement.IsFilled)
                 return;
-            }
 
             if (checkNeighbours && !firstGridElement.IsNeighbourOf(secondGridElement))
                 return;
 
             ExecuteValidatedMove(firstGridElement, secondGridElement);
+        }
+
+        /// <summary>
+        /// This method will be called after the grid is created.
+        /// </summary>
+        protected virtual void OnAwake(){
+        }
+
+        private void Awake(){
+            grid = new Grid<T>(width, height, cellSize, origin);
+            OnAwake();
         }
     }
 }

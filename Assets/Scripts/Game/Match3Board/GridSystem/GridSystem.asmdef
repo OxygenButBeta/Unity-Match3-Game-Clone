@@ -2,7 +2,8 @@
     "name": "GridSystem",
     "rootNamespace": "",
     "references": [
-        "GUID:d0a54c5595aaa86469d03e20bd1a5ee6"
+        "GUID:d0a54c5595aaa86469d03e20bd1a5ee6",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -8,21 +8,21 @@ namespace Match3{
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class PositionToIndexValidator : IBoardMoveActionValidator{
-        public bool ValidateMoveAction(WorldGrid grid, BoardSwipeActionData boardSwipeActionData){
+        public bool ValidateMoveAction(WorldGrid grid, SwipeActionData swipeActionData){
             
             // Check if the move is valid
-            if (boardSwipeActionData.DesignatedDirection == Vector2Int.zero)
+            if (swipeActionData.DesignatedDirection == Vector2Int.zero)
                 return false;
 
             // Check if there is a cell at the start position
-            if (!grid.TryToGetElementIndexFromWorldPosition(boardSwipeActionData.startPositionScreenToWorld,
+            if (!grid.TryToGetElementIndexFromWorldPosition(swipeActionData.startPositionScreenToWorld,
                     out var firstElementIndex)){
                 Debug.Log("There is no cell at the start position");
                 return false;
             }
 
             // Check if there is a cell at the end position
-            if (!grid.IsIndexWithinBounds(firstElementIndex + boardSwipeActionData.DesignatedDirection)){
+            if (!grid.IsIndexWithinBounds(firstElementIndex + swipeActionData.DesignatedDirection)){
                 Debug.Log("There is no cell at the end position");
                 return false;
             }

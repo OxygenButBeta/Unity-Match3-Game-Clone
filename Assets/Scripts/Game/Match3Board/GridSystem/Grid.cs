@@ -54,6 +54,13 @@ namespace O2.Grid{
         /// <returns></returns>
         public GridElement<T> GetGridElementAt(Vector2Int index) => gridArray[index.x, index.y];
 
+
+        public IEnumerable<GridElement<T>> GetGridElements(IEnumerable<Vector2Int> indices){
+            foreach (Vector2Int index in indices){
+                yield return GetGridElementAt(index);
+            }
+        }
+
         public GridElement<T> GetGridElementWithWorldPosition(Vector3 worldPosition) =>
             GetGridElementAt(GetElementIndexFromWorldPosition(worldPosition));
 

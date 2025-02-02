@@ -14,11 +14,11 @@ namespace Match3
         /// Validates the move on the board. If the move is valid, it returns true and the indices of the elements that will be moved.
         /// </summary>
         /// <param name="grid"></param>
-        /// <param name="boardSwipeActionData"> </param>
+        /// <param name="swipeActionData"> </param>
         /// <param name="firstElementIndex"></param>
         /// <param name="secondElementIndex"></param>
         /// <returns></returns>
-        public bool ValidateMoveAction(WorldGrid grid, BoardSwipeActionData boardSwipeActionData);
+        public bool ValidateMoveAction(WorldGrid grid, SwipeActionData swipeActionData);
 
     }
 }

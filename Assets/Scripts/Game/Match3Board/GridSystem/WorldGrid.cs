@@ -8,7 +8,6 @@ namespace O2.Grid{
     public class WorldGrid{
         // The width and height of the grid.
         public readonly int width;
-
         public readonly int height;
 
         // The size of each cell in the grid.
