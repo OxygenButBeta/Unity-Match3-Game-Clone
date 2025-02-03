@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using O2.Extensions;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace O2.Grid{
     /// <typeparam name="T"></typeparam>
     public sealed class Grid<T> : WorldGrid{
         // The 2D array of GridElement.
-        public readonly GridElement<T>[,] gridArray;
+        internal readonly GridElement<T>[,] gridArray;
 
         //Constructor
         public Grid(int width, int height, float cellSize, Vector3 origin) : base(width, height, cellSize, origin){
@@ -56,11 +57,8 @@ namespace O2.Grid{
 
 
         public IEnumerable<GridElement<T>> GetGridElements(IEnumerable<Vector2Int> indices){
-            foreach (Vector2Int index in indices){
-                yield return GetGridElementAt(index);
-            }
+            return indices.Select(GetGridElementAt);
         }
-
         public GridElement<T> GetGridElementWithWorldPosition(Vector3 worldPosition) =>
             GetGridElementAt(GetElementIndexFromWorldPosition(worldPosition));
 
@@ -90,7 +88,7 @@ namespace O2.Grid{
         /// <param name="index"></param>
         /// <param name="gridElement"></param>
         /// <returns></returns>
-        public bool GetGridElementIfIsNotDisabled(Vector2Int index, out GridElement<T> gridElement){
+        public bool GetGridElementIfNotStatic(Vector2Int index, out GridElement<T> gridElement){
             if (TryToGetGridElementAt(index, out gridElement))
                 return !gridElement.IsStatic;
             return false;

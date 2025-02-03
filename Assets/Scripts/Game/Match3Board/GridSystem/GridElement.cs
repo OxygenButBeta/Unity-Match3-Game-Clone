@@ -11,13 +11,15 @@ namespace O2.Grid{
         /// The item of the grid element.
         public T Item;
 
-        /// A flag to disable the grid element.
+        /// If True, the grid element is static and cannot be moved in the grid.
         public bool IsStatic;
 
         /// A flag to disable the grid element.
         public bool IsFilled = true;
-        
+
+        /// The index of the element in the grid. [x, y]
         public Vector2Int Index;
+
         public GridElement(int x, int y) => Index = new Vector2Int(x, y);
 
         /// <summary>

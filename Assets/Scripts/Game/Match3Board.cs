@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using O2.Grid;
@@ -13,6 +14,7 @@ namespace Match3{
         [SerializeField] Candy prefab;
         [SerializeField, TabGroup("Game Options")] float fallDuration = 0.5f;
         [SerializeField, TabGroup("Game Options")] bool allow2x2Matches = true;
+        [SerializeField, TabGroup("Game Options")] bool fallDiagonal = true;
 
         Vector2Int dragStartIndex;
         Vector2Int dragEndIndex;
@@ -30,17 +32,24 @@ namespace Match3{
 
         #endregion
 
+        // __ Cache __
+        readonly List<UniTask> relocateSpawnedCandiesTasks = new();
+        readonly List<UniTask> explodeTasks = new();
+        readonly HashSet<Vector2Int> matches = new();
+        // __ Cache __
+
+        ScriptableCandy GetRandomCandySO() => scriptableCandies[Random.Range(0, scriptableCandies.Length)];
 
         protected override void OnAwake(){
             foreach (var element in grid.IterateAll()){
-                element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform);
-                element.Item.SetScriptableCandy(scriptableCandies[Random.Range(0, scriptableCandies.Length)]);
+                element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform)
+                    .SetScriptableCandy(GetRandomCandySO());
             }
 
             gridGravityOptions = new GridGravityOptions<Candy>(
                 (element) => element.Item.IsExploded,
                 (element) => element.Item.transform.DOMove(grid.GetWorldPosition(element), fallDuration)
-                    .SetEase(Ease.OutBack));
+                    .SetEase(Ease.OutBack), fallDiagonal);
 
             SetCameraToCenter();
             ProcessMatches().Forget();
@@ -59,11 +68,10 @@ namespace Match3{
             // Swap the values and Swap in the visual
             await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
             grid.SwapValues(firstGridElement, secondGridElement);
-
-            HashSet<Vector2Int> matchResult = FindMatches();
+            FindMatches();
 
             // Swap back if no match
-            if (matchResult.Count == 0){
+            if (matches.Count == 0){
                 await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
                 grid.SwapValues(firstGridElement, secondGridElement);
                 ignoreInput = false;
@@ -76,17 +84,15 @@ namespace Match3{
 
         async UniTask ProcessMatches(){
             while (true){
-                HashSet<Vector2Int> matchIndices = FindMatches();
+                FindMatches();
 
-                if (matchIndices.Count == 0)
+                if (matches.Count == 0)
                     break; // No more matches
 
-                await ExplodeMatches(matchIndices);
+                await ExplodeMatches();
 
                 // Gravity Simulation
-                var hasFallen = GridSystemUtilities.SimulateGravity(grid, gridGravityOptions);
-
-                if (hasFallen)
+                if (GridSystemUtilities.SimulateGravity(grid, gridGravityOptions))
                     await UniTask.Delay(Convert.ToInt32(fallDuration * 1000)); // Wait for the fall to finish
 
                 await SpawnNewCandies();
@@ -94,42 +100,37 @@ namespace Match3{
         }
 
         private async UniTask SpawnNewCandies(){
-            List<UniTask> spawnTasks = new();
-
-            foreach (var element in grid.IterateAll(true)){
-                if (!element.IsStatic)
+            foreach (GridElement<Candy> element in grid.IterateAll(true)){
+                if (!element.Item.IsExploded)
                     continue;
 
-                element.IsStatic = false;
-                element.Item.gameObject.SetActive(true);
-                element.Item.IsExploded = false;
                 element.IsFilled = true;
-                element.Item.SetScriptableCandy(scriptableCandies[Random.Range(0, scriptableCandies.Length)]);
-                var pos = grid.GetWorldPosition(element);
-                element.Item.transform.position = new Vector3(pos.x, 10 + pos.y, pos.z);
-                spawnTasks.Add(element.Item.transform.DOMove(pos, .6f).SetEase(Ease.InOutQuad).ToUniTask());
+                Vector3 pos = grid.GetWorldPosition(element);
+                element.Item.SetScriptableCandy(GetRandomCandySO())
+                    .Reactivate()
+                    .SetPosition(new Vector3(pos.x, 10 + pos.y, pos.z));
+
+                relocateSpawnedCandiesTasks.Add(element.Item.transform.DOMove(pos, .6f).SetEase(Ease.InOutQuad)
+                    .ToUniTask());
             }
 
-            await UniTask.WhenAll(spawnTasks);
+            await UniTask.WhenAll(relocateSpawnedCandiesTasks);
+            relocateSpawnedCandiesTasks.Clear();
         }
 
-        async UniTask ExplodeMatches(HashSet<Vector2Int> matchIndices){
-            List<UniTask> explodeTasks = new();
-            foreach (var gridItem in grid.GetGridElements(matchIndices)){
-                if (gridItem.IsStatic) // Don't explode static items
+        async UniTask ExplodeMatches(){
+            GridElement<Candy>[] elementsToExplode = grid.GetGridElements(matches).ToArray();
+
+            foreach (GridElement<Candy> gridItem in elementsToExplode){
+                if (gridItem.Item.IsExploded) // Don't explode static items
                     continue;
                 explodeTasks.Add(CreateAnim(gridItem));
             }
 
             await UniTask.WhenAll(explodeTasks);
-
-            Debug.Log("Exploded");
-
-            foreach (var gridItem in grid.GetGridElements(matchIndices)){
-                gridItem.IsStatic = true;
-                gridItem.Item.gameObject.SetActive(false);
-                gridItem.Item.transform.localScale = Vector3.one * .6f;
-                gridItem.Item.IsExploded = true;
+            explodeTasks.Clear();
+            foreach (GridElement<Candy> gridItem in elementsToExplode){
+                gridItem.Item.Explode();
                 gridItem.IsFilled = false;
             }
         }
@@ -141,9 +142,8 @@ namespace Match3{
         }
 
 
-        HashSet<Vector2Int> FindMatches(){
-            HashSet<Vector2Int> match = new();
-
+        void FindMatches(){
+            matches.Clear();
             for (int i = 0; i < width * height; i++){
                 var x = i % width;
                 var y = i / width;
@@ -153,18 +153,18 @@ namespace Match3{
                 if (x < width - 2 &&
                     grid.GetGridElementAt(x + 1, y).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
                     grid.GetGridElementAt(x + 2, y).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy)){
-                    match.Add(new Vector2Int(x, y));
-                    match.Add(new Vector2Int(x + 1, y));
-                    match.Add(new Vector2Int(x + 2, y));
+                    matches.Add(new Vector2Int(x, y));
+                    matches.Add(new Vector2Int(x + 1, y));
+                    matches.Add(new Vector2Int(x + 2, y));
                 }
 
                 // Vertical
                 if (y < height - 2 &&
                     grid.GetGridElementAt(x, y + 1).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
                     grid.GetGridElementAt(x, y + 2).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy)){
-                    match.Add(new Vector2Int(x, y));
-                    match.Add(new Vector2Int(x, y + 1));
-                    match.Add(new Vector2Int(x, y + 2));
+                    matches.Add(new Vector2Int(x, y));
+                    matches.Add(new Vector2Int(x, y + 1));
+                    matches.Add(new Vector2Int(x, y + 2));
                 }
 
                 // 2x2 Square
@@ -175,14 +175,12 @@ namespace Match3{
                     grid.GetGridElementAt(x, y + 1).Item.scriptableCandy.Equals(currentElement.Item.scriptableCandy) &&
                     grid.GetGridElementAt(x + 1, y + 1).Item.scriptableCandy
                         .Equals(currentElement.Item.scriptableCandy)){
-                    match.Add(new Vector2Int(x, y));
-                    match.Add(new Vector2Int(x + 1, y));
-                    match.Add(new Vector2Int(x, y + 1));
-                    match.Add(new Vector2Int(x + 1, y + 1));
+                    matches.Add(new Vector2Int(x, y));
+                    matches.Add(new Vector2Int(x + 1, y));
+                    matches.Add(new Vector2Int(x, y + 1));
+                    matches.Add(new Vector2Int(x + 1, y + 1));
                 }
             }
-
-            return match;
         }
     }
 }

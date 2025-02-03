@@ -12,9 +12,12 @@ namespace O2.Grid{
         /// </summary>
         public readonly Action<GridElement<T>> onCellFallAction;
 
-        public GridGravityOptions( Predicate<GridElement<T>> cellFallCondition, Action<GridElement<T>> onCellFallAction){
+        public readonly bool FallDiagonal;
+
+        public GridGravityOptions( Predicate<GridElement<T>> cellFallCondition, Action<GridElement<T>> onCellFallAction, bool fallDiagonal){
             this.CellFallCondition = cellFallCondition;
             this.onCellFallAction = onCellFallAction;
+            FallDiagonal = fallDiagonal;
         }
     }
 }
