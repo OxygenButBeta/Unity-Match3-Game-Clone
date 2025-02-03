@@ -344,11 +344,19 @@ MonoBehaviour:
   - rid: 7478115733003305032
   scriptableCandies:
   - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
+  - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
+  - {fileID: 11400000, guid: 04d66a8014c71f64fa70ce230c882b91, type: 2}
+  - {fileID: 11400000, guid: 7a17404b7f181c344b747f1f211f7986, type: 2}
+  - {fileID: 11400000, guid: a7a96a03e31e6fa40a0d79d081ef6a39, type: 2}
+  - {fileID: 11400000, guid: 366c0859aac426a48bcdd2c27f527c43, type: 2}
+  - {fileID: 11400000, guid: 31e70810de49b9b40899148e25f18f86, type: 2}
+  - {fileID: 11400000, guid: 2cb73f61f79fad8499e62b6fd6d763ef, type: 2}
   - {fileID: 11400000, guid: 5d0fe9f89eb9096459e15d75f670b362, type: 2}
   - {fileID: 11400000, guid: 556fa891bd7be964cae9da33a343aae0, type: 2}
   prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
   fallDuration: 0.5
   allow2x2Matches: 1
+  fallDiagonal: 0
   references:
     version: 2
     RefIds:
