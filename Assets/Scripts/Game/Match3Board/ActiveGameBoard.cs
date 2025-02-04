@@ -13,7 +13,7 @@ namespace Match3{
         [SerializeField, TabGroup("Validation Options")] protected bool checkNeighbours = true;
 
         // The grid that represents the game board.
-        public Grid<T> grid;
+        public Grid<T> grid{ get; private set; }
 
         /// <summary>
         /// Validators to validate the move action.

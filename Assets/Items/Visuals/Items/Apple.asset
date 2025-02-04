@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df0adebb1d7a4315b3f0be9bdebacfdb, type: 3}
   m_Name: Apple
   m_EditorClassIdentifier: 
+  candyBehaviours:
+  - rid: 3997121798396968960
   sprite: {fileID: 21300000, guid: cdb00ee7dde765d42b7679a63871245e, type: 3}
+  references:
+    version: 2
+    RefIds:
+    - rid: 3997121798396968960
+      type: {class: RowExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
+      data: 

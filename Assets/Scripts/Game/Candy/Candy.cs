@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using O2.Grid;
+using UnityEngine;
 
 namespace Match3{
     public class Candy : MonoBehaviour{
@@ -7,19 +8,21 @@ namespace Match3{
         public bool IsExploded{ get; private set; }
         Vector3 originalScale;
 
-
         private void Awake(){
             originalScale = transform.localScale;
         }
 
-
         public Candy SetScriptableCandy(ScriptableCandy candySO){
-            this.scriptableCandy = candySO;
+            scriptableCandy = candySO;
             image.sprite = candySO.sprite;
             return this;
         }
 
-        public Candy Explode(){
+        public Candy Explode(Match3Board board, GridElement<Candy> selfGridElement){
+            foreach (var candyBehaviour in scriptableCandy.candyBehaviours){
+                candyBehaviour.OnExplode(board, selfGridElement);
+            }
+
             gameObject.SetActive(false);
             transform.localScale = originalScale;
             IsExploded = true;

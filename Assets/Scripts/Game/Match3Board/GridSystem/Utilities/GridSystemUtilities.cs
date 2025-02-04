@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
 
 namespace O2.Grid{
     public static class GridSystemUtilities{
@@ -32,7 +34,7 @@ namespace O2.Grid{
 
                 if (below.IsFilled){
                     if (!gridGravityOptions.FallDiagonal)
-                        break; 
+                        break;
 
                     // bottom right diagonal
                     if (fallToIndex.x + 1 < grid.width){
@@ -52,7 +54,7 @@ namespace O2.Grid{
                         }
                     }
 
-                    break; 
+                    break;
                 }
 
                 fallToIndex = below.Index;
@@ -60,5 +62,7 @@ namespace O2.Grid{
 
             return fallToIndex;
         }
+
+      
     }
 }

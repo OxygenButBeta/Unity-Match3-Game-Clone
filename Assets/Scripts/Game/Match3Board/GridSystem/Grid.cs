@@ -28,8 +28,8 @@ namespace O2.Grid{
         /// <param name="start"></param>
         /// <param name="end"></param>
         public void SwapValues(GridElement<T> start, GridElement<T> end){
-            var startIndex = start.Index;
-            var endIndex = end.Index;
+            Vector2Int startIndex = start.Index;
+            Vector2Int endIndex = end.Index;
 
             (start.Index, end.Index) = (end.Index, start.Index);
 
@@ -59,6 +59,7 @@ namespace O2.Grid{
         public IEnumerable<GridElement<T>> GetGridElements(IEnumerable<Vector2Int> indices){
             return indices.Select(GetGridElementAt);
         }
+
         public GridElement<T> GetGridElementWithWorldPosition(Vector3 worldPosition) =>
             GetGridElementAt(GetElementIndexFromWorldPosition(worldPosition));
 
@@ -111,6 +112,11 @@ namespace O2.Grid{
                         yield return temp;
                 }
             }
+        }
+
+        public bool FindMatches(in HashSet<Vector2Int> matches, IEqualityComparer<T> comparer,
+            bool allow2x2Matches = true){
+            return GridUtilities.FindMatchesNonAlloc(matches, comparer, this, allow2x2Matches);
         }
     }
 }
