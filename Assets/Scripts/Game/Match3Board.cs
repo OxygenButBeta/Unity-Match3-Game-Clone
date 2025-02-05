@@ -35,17 +35,6 @@ namespace Match3{
         readonly List<UniTask> relocateSpawnedCandiesTasks = new();
         readonly HashSet<Vector2Int> matches = new();
 
-        #region Trash
-
-        void SetCameraToCenter(){
-            var center = grid.GetGridElementAt(width / 2, height / 2);
-            var y = center.Item.transform.position.y + center.Item.transform.position.y / 2;
-            var camera = Camera.main;
-            camera.transform.position = new Vector3(camera.transform.position.x, y, camera.transform.position.z);
-        }
-
-        #endregion
-
 
         ScriptableCandy GetRandomCandySO() => scriptableCandies[Random.Range(0, scriptableCandies.Length)];
 
@@ -61,8 +50,7 @@ namespace Match3{
                 (element) => element.Item.transform.DOMove(grid.GetWorldPosition(element), fallDuration)
                     .SetEase(Ease.OutBack), fallDiagonal);
 
-
-            SetCameraToCenter();
+            moveOnProcess = true;
             ProcessMatches().Forget();
         }
 
@@ -91,7 +79,6 @@ namespace Match3{
             }
 
             await ProcessMatches();
-            moveOnProcess = false;
         }
 
         async UniTask ProcessMatches(){
@@ -112,6 +99,8 @@ namespace Match3{
                 if (spawnNewCandies)
                     await SpawnNewCandies();
             }
+
+            moveOnProcess = false;
         }
 
         private async UniTask SpawnNewCandies(){

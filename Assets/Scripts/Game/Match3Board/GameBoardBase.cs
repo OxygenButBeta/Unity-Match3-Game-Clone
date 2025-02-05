@@ -19,6 +19,9 @@ namespace Match3{
         [field: SerializeField, TabGroup("Grid Options"), Tooltip("Origin of the grid")]
         protected Vector2 origin{ get; private set; }
 
+        // ReSharper disable once PossibleLossOfFraction
+        public Vector2 GetWorldCenter() => new Vector3(width / 2, height / 2) * cellSize + (Vector3)origin;
+
         /// <summary>
         /// The method that will be called when a move is executed.
         /// </summary>

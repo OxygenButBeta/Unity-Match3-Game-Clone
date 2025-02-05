@@ -71,5 +71,13 @@ namespace O2.Grid{
             var y = Mathf.RoundToInt(localPos.y / cellSize);
             return new Vector2Int(x, y);
         }
+        
+        public Vector2Int GetGridCenterIndex()
+        {
+            var centerX = Mathf.FloorToInt((width - 1) / 2f);
+            var centerY = Mathf.FloorToInt((height - 1) / 2f);
+
+            return new Vector2Int(centerX, centerY);
+        }
     }
 }

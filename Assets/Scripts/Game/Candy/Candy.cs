@@ -1,7 +1,5 @@
-﻿using Match3.VFX;
-using O2.Grid;
+﻿using O2.Grid;
 using UnityEngine;
-using UnityEngine.VFX;
 
 namespace Match3{
     public class Candy : MonoBehaviour{
