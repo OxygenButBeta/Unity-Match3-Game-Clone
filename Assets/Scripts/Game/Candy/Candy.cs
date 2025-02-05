@@ -1,5 +1,7 @@
-﻿using O2.Grid;
+﻿using Match3.VFX;
+using O2.Grid;
 using UnityEngine;
+using UnityEngine.VFX;
 
 namespace Match3{
     public class Candy : MonoBehaviour{
@@ -7,6 +9,7 @@ namespace Match3{
         public SpriteRenderer image;
         public bool IsExploded{ get; private set; }
         Vector3 originalScale;
+        public Match3Board Board;
 
         private void Awake(){
             originalScale = transform.localScale;
@@ -19,8 +22,15 @@ namespace Match3{
         }
 
         public Candy Explode(Match3Board board, GridElement<Candy> selfGridElement){
-            foreach (var candyBehaviour in scriptableCandy.candyBehaviours){
+            foreach (var candyBehaviour in scriptableCandy.candyBehaviours)
                 candyBehaviour.OnExplode(board, selfGridElement);
+
+            return ExplodeImmediate();
+        }
+
+        public Candy ExplodeImmediate(bool internalCall = false){
+            if (internalCall){
+                Board.m3BoardVFX.DirectExplode(this);
             }
 
             gameObject.SetActive(false);
@@ -29,7 +39,8 @@ namespace Match3{
             return this;
         }
 
-        public Candy Reactivate(){
+
+        public Candy ReActivate(){
             gameObject.SetActive(true);
             IsExploded = false;
             return this;

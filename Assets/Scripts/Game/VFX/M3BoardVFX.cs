@@ -5,26 +5,30 @@ using O2.Grid;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.VFX;
 
 namespace Match3.VFX{
     public class M3BoardVFX : MonoBehaviour{
         [SerializeField] Match3Board board;
 
-        [SerializeField, TabGroup("VFX")] GameObject explosionVfxPrefab;
+        [SerializeField, TabGroup("VFX")] VisualEffect explosionVfxPrefab;
         [SerializeField, TabGroup("VFX")] float explosionVfxLifeTime = 0.5f;
         [SerializeField, TabGroup("VFX")] GameObject SwipeVFX;
         [SerializeField, TabGroup("VFX")] float SwipeVfxLifeTime = 0.5f;
-        ObjectPool<GameObject> explosionVfxPool;
+        ObjectPool<VisualEffect> explosionVfxPool;
 
         private void Awake(){
             SwipeVFX.SetActive(false);
-
+            InitPool();
             board.OnCandyExplode += OnCandyExplode;
             board.OnCandySwap += OnCandySwap;
-            explosionVfxPool = new ObjectPool<GameObject>(
+        }
+
+        private void InitPool(){
+            explosionVfxPool = new ObjectPool<VisualEffect>(
                 createFunc: () => Instantiate(explosionVfxPrefab),
-                actionOnGet: (obj) => obj.SetActive(true),
-                actionOnRelease: (obj) => obj.SetActive(false),
+                actionOnGet: (obj) => obj.gameObject.SetActive(true),
+                actionOnRelease: (obj) => obj.gameObject.SetActive(false),
                 defaultCapacity: 10,
                 maxSize: 20
             );
@@ -38,16 +42,26 @@ namespace Match3.VFX{
         }
 
         private void OnCandyExplode(GridElement<Candy> item){
-            GetExplosionVfx().transform.position = item.Item.transform.position;
+            DirectExplode(item.Item);
         }
 
-        GameObject GetExplosionVfx(){
-            GameObject explosionVfx = explosionVfxPool.Get();
+        public void DirectExplode(Candy candy){
+            var explosionVfx = GetExplosionVfx();
+            explosionVfx.visualEffectAsset = candy.scriptableCandy.explosionVfx;
+            explosionVfx.transform.position = candy.transform.position;
+        }
+
+        VisualEffect GetExplosionVfx(){
+            if (explosionVfxPool == null)
+                InitPool();
+
+            // ReSharper disable once PossibleNullReferenceException
+            VisualEffect explosionVfx = explosionVfxPool.Get();
             ReleaseExplosionVfx(explosionVfx).Forget();
             return explosionVfx;
         }
 
-        async UniTaskVoid ReleaseExplosionVfx(GameObject explosionVfx){
+        async UniTaskVoid ReleaseExplosionVfx(VisualEffect explosionVfx){
             await UniTask.Delay(TimeSpan.FromSeconds(explosionVfxLifeTime));
             explosionVfxPool.Release(explosionVfx);
         }

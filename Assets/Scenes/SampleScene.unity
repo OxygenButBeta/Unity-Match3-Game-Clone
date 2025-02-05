@@ -345,17 +345,21 @@ MonoBehaviour:
   - rid: 7478115733003305032
   scriptableCandies:
   - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
-  - {fileID: 11400000, guid: 7b40b1dd625bae64da23886633e75832, type: 2}
-  - {fileID: 11400000, guid: 7a17404b7f181c344b747f1f211f7986, type: 2}
+  - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
+  - {fileID: 11400000, guid: f04ab0b3da462f34480656ef0fbd7c1d, type: 2}
+  - {fileID: 11400000, guid: 09f16cdc7cf391f4ca9732273547da0f, type: 2}
+  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
+  - {fileID: 11400000, guid: 90bbe1218f5cebc42bf1c8c938e6b97c, type: 2}
   prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
   fallDuration: 0.5
   allow2x2Matches: 1
   fallDiagonal: 0
-  spawnNewCandies: 0
+  spawnNewCandies: 1
   fallOffset: 0.5
-  fallDurationDelay: 0.5
+  fallDurationDelay: 0.3
   fallMag: 0.05
   afterExplosionDelay: 0.5
+  <m3BoardVFX>k__BackingField: {fileID: 965410007}
   references:
     version: 2
     RefIds:
@@ -405,7 +409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   board: {fileID: 965410004}
-  explosionVfxPrefab: {fileID: 1785797986}
+  explosionVfxPrefab: {fileID: 1785797988}
   explosionVfxLifeTime: 0.5
   SwipeVFX: {fileID: 1357885857}
   SwipeVfxLifeTime: 0.5
@@ -554,12 +558,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1354443656969227799, guid: 021bbf96a19906642a0e41fb58b29fc4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2357178720221642882, guid: 021bbf96a19906642a0e41fb58b29fc4, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3411754766572351756, guid: 021bbf96a19906642a0e41fb58b29fc4, type: 3}
+      propertyPath: m_Asset
+      value: 
+      objectReference: {fileID: 8926484042661614526, guid: c4ab81e245a1b0047b8d99943f91a6a5, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -700,9 +708,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 139556ecb17152c4ab373f6aba9c4fc2, type: 3}
---- !u!1 &1785797986 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 410749768702137879, guid: 139556ecb17152c4ab373f6aba9c4fc2, type: 3}
+--- !u!2083052967 &1785797988 stripped
+VisualEffect:
+  m_CorrespondingSourceObject: {fileID: 2140072152015084999, guid: 139556ecb17152c4ab373f6aba9c4fc2, type: 3}
   m_PrefabInstance: {fileID: 1785797985}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1926508484

@@ -13,11 +13,16 @@ MonoBehaviour:
   m_Name: Apple
   m_EditorClassIdentifier: 
   candyBehaviours:
-  - rid: 3997121798396968960
+  - rid: 3997121813936603212
+  - rid: 3997121813936603215
+  explosionVfx: {fileID: 8926484042661614526, guid: 9717a0288d705fc4097c3104a8c6363d, type: 3}
   sprite: {fileID: 21300000, guid: cdb00ee7dde765d42b7679a63871245e, type: 3}
   references:
     version: 2
     RefIds:
-    - rid: 3997121798396968960
+    - rid: 3997121813936603212
       type: {class: RowExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
+      data: 
+    - rid: 3997121813936603215
+      type: {class: ColumnExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
       data: 

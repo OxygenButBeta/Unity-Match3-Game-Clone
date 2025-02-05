@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Match3.VFX;
 using O2.Grid;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace Match3{
         [SerializeField, TabGroup("Game Options")] private float fallDurationDelay;
         [SerializeField, TabGroup("Game Options")] float fallMag = 0.05f;
         [SerializeField, TabGroup("Visual")] float afterExplosionDelay = 0.5f;
-
+        [field: SerializeField] public M3BoardVFX m3BoardVFX{ get; private set; }
 
         GridGravityOptions<Candy> gridGravityOptions;
         readonly CandyEqualityComparer equalityComparer = new();
@@ -52,6 +53,7 @@ namespace Match3{
             foreach (GridElement<Candy> element in grid.IterateAll()){
                 element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform)
                     .SetScriptableCandy(GetRandomCandySO());
+                element.Item.Board = this;
             }
 
             gridGravityOptions = new GridGravityOptions<Candy>(
@@ -98,13 +100,14 @@ namespace Match3{
                     break; // No more matches
 
                 ExplodeMatches();
-                await UniTask.Delay(
+                await UniTask.Delay( // Wait for the explosion to finish
                     TimeSpan.FromSeconds(afterExplosionDelay -
-                                         (afterExplosionDelay / 3))); // Wait for the explosion to finish
+                                         (afterExplosionDelay / 3)));
 
                 // Gravity Simulation
                 if (GridSystemUtilities.SimulateGravity(grid, gridGravityOptions))
-                    await UniTask.Delay(Convert.ToInt32(fallDuration * 1000)); // Wait for the fall to finish
+                    await UniTask.Delay(Convert.ToInt32(fallDuration * 1000));
+                // Wait for the fall to finish
 
                 if (spawnNewCandies)
                     await SpawnNewCandies();
@@ -120,8 +123,9 @@ namespace Match3{
                 iterationCount++;
                 element.IsFilled = true;
                 Vector3 pos = grid.GetWorldPosition(element);
-                element.Item.SetScriptableCandy(GetRandomCandySO())
-                    .Reactivate()
+                element.Item
+                    .SetScriptableCandy(GetRandomCandySO())
+                    .ReActivate()
                     .SetPosition(new Vector3(pos.x, 10 + pos.y + (fallOffset * iterationCount), pos.z));
 
                 var _fallDuration = fallDurationDelay;
@@ -142,7 +146,8 @@ namespace Match3{
         void ExplodeMatches(){
             GridElement<Candy>[] elementsToExplode = grid.GetGridElements(matches).ToArray();
             foreach (GridElement<Candy> gridItem in elementsToExplode){
-                if (gridItem.Item.IsExploded) // Don't explode static items
+                // Don't explode static items
+                if (gridItem.Item.IsExploded)
                     continue;
 
                 OnCandyExplode?.Invoke(gridItem);
