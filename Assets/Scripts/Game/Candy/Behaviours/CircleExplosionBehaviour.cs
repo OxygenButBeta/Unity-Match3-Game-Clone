@@ -1,11 +1,13 @@
-﻿using O2.Grid;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using O2.Grid;
 using UnityEngine;
 
 namespace Match3{
     public class CircleExplosionBehaviour : ICandyBehaviour{
         [SerializeField] int radius = 1;
-
-        public void OnExplode(Match3Board board, GridElement<Candy> selfGridElement){
+        [SerializeField] private float delay;
+        public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
             Vector2Int gridPos = selfGridElement.Index;
 
             for (var x = -radius; x <= radius; x++)
@@ -25,9 +27,14 @@ namespace Match3{
                 if (element.Item.IsExploded)
                     continue;
 
-                element.IsFilled = false;
-                element.Item.ExplodeImmediate(true);
+                element.Item.transform.DOShakeRotation(delay, 90, 20, 90).onComplete =
+                    () => {
+                        element.IsFilled = false;
+                        element.Item.ExplodeImmediate();
+                    };
             }
+
+            await UniTask.WaitForSeconds(delay);
         }
     }
 }

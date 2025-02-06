@@ -11,7 +11,6 @@ using Random = UnityEngine.Random;
 
 namespace Match3{
     public class Match3Board : ActiveGameBoard<Candy>{
-        public event Action<GridElement<Candy>> OnCandyExplode;
         public event Action<GridElement<Candy>, GridElement<Candy>> OnCandySwap;
 
         [SerializeField] ScriptableCandy[] scriptableCandies;
@@ -25,7 +24,7 @@ namespace Match3{
         [SerializeField, TabGroup("Game Options")] private float fallDurationDelay;
         [SerializeField, TabGroup("Game Options")] float fallMag = 0.05f;
         [SerializeField, TabGroup("Visual")] float afterExplosionDelay = 0.5f;
-        [field: SerializeField] public M3BoardVFX m3BoardVFX{ get; private set; }
+        [SerializeField] M3BoardVFX m3BoardVFX;
 
         GridGravityOptions<Candy> gridGravityOptions;
         readonly CandyEqualityComparer equalityComparer = new();
@@ -42,7 +41,7 @@ namespace Match3{
             foreach (GridElement<Candy> element in grid.IterateAll()){
                 element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform)
                     .SetScriptableCandy(GetRandomCandySO());
-                element.Item.Board = this;
+                element.Item.vfxRunner = m3BoardVFX;
             }
 
             gridGravityOptions = new GridGravityOptions<Candy>(
@@ -86,7 +85,7 @@ namespace Match3{
                 if (!grid.FindMatches(matches, equalityComparer, allow2x2Matches))
                     break; // No more matches
 
-                ExplodeMatches();
+                await ExplodeMatches();
                 await UniTask.Delay( // Wait for the explosion to finish
                     TimeSpan.FromSeconds(afterExplosionDelay -
                                          (afterExplosionDelay / 3)));
@@ -132,15 +131,15 @@ namespace Match3{
             relocateSpawnedCandiesTasks.Clear();
         }
 
-        void ExplodeMatches(){
+        async UniTask ExplodeMatches(){
             GridElement<Candy>[] elementsToExplode = grid.GetGridElements(matches).ToArray();
             foreach (GridElement<Candy> gridItem in elementsToExplode){
                 // Don't explode static items
                 if (gridItem.Item.IsExploded)
                     continue;
 
-                OnCandyExplode?.Invoke(gridItem);
-                gridItem.Item.Explode(this, gridItem);
+                await gridItem.Item.ExplodeAsync(this, gridItem);
+                // gridItem.Item.Explode(this, gridItem);
                 gridItem.IsFilled = false;
             }
         }

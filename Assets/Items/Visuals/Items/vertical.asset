@@ -10,11 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df0adebb1d7a4315b3f0be9bdebacfdb, type: 3}
-  m_Name: Potion - Blue (Border)
+  m_Name: vertical
   m_EditorClassIdentifier: 
-  candyBehaviours: []
+  candyBehaviours:
+  - rid: 3997121835095556176
+  <ExplosionDelay>k__BackingField: 0.5
   explosionVfx: {fileID: 8926484042661614526, guid: 9717a0288d705fc4097c3104a8c6363d, type: 3}
-  sprite: {fileID: 21300000, guid: f8f71b78e8bfb594990fe0fb67b4bc6f, type: 3}
+  sprite: {fileID: 21300000, guid: 548064cff3c6cc4468080f876a10826b, type: 3}
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 3997121835095556176
+      type: {class: ColumnExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
+      data:
+        delay: 0.5

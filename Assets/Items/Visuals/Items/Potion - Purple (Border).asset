@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Potion - Purple (Border)
   m_EditorClassIdentifier: 
   candyBehaviours: []
+  <ExplosionDelay>k__BackingField: 0.5
   explosionVfx: {fileID: 8926484042661614526, guid: 9717a0288d705fc4097c3104a8c6363d, type: 3}
   sprite: {fileID: 21300000, guid: 91a7bd2ef53a41d48be7ac968cc15d09, type: 3}
   references:

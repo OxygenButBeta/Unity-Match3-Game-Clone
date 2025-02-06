@@ -20,7 +20,6 @@ namespace Match3.VFX{
         private void Awake(){
             SwipeVFX.SetActive(false);
             InitPool();
-            board.OnCandyExplode += OnCandyExplode;
             board.OnCandySwap += OnCandySwap;
         }
 
@@ -41,28 +40,35 @@ namespace Match3.VFX{
                 .OnComplete(() => SwipeVFX.SetActive(false));
         }
 
-        private void OnCandyExplode(GridElement<Candy> item){
-            DirectExplode(item.Item);
-        }
-
         public void DirectExplode(Candy candy){
             var explosionVfx = GetExplosionVfx();
             explosionVfx.visualEffectAsset = candy.scriptableCandy.explosionVfx;
             explosionVfx.transform.position = candy.transform.position;
         }
 
-        VisualEffect GetExplosionVfx(){
+        public void PlayVfx(VisualEffectAsset effect, Vector3 position, float lifeTime){
+            var explosionVfx = GetFromPool();
+            explosionVfx.visualEffectAsset = effect;
+            explosionVfx.transform.position = position;
+            ReleaseExplosionVfx(explosionVfx, lifeTime).Forget();
+        }
+
+        VisualEffect GetFromPool(){
             if (explosionVfxPool == null)
                 InitPool();
 
             // ReSharper disable once PossibleNullReferenceException
-            VisualEffect explosionVfx = explosionVfxPool.Get();
-            ReleaseExplosionVfx(explosionVfx).Forget();
+            return explosionVfxPool.Get();
+        }
+
+        VisualEffect GetExplosionVfx(){
+            var explosionVfx = GetFromPool();
+            ReleaseExplosionVfx(explosionVfx, explosionVfxLifeTime).Forget();
             return explosionVfx;
         }
 
-        async UniTaskVoid ReleaseExplosionVfx(VisualEffect explosionVfx){
-            await UniTask.Delay(TimeSpan.FromSeconds(explosionVfxLifeTime));
+        async UniTaskVoid ReleaseExplosionVfx(VisualEffect explosionVfx, float lifeTime){
+            await UniTask.Delay(TimeSpan.FromSeconds(lifeTime));
             explosionVfxPool.Release(explosionVfx);
         }
     }

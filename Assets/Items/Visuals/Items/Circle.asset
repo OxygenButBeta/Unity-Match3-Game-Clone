@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df0adebb1d7a4315b3f0be9bdebacfdb, type: 3}
-  m_Name: Balloon - Blue
+  m_Name: Circle
   m_EditorClassIdentifier: 
   candyBehaviours:
-  - rid: 3997121813936603217
+  - rid: 3997121813936603216
+  <ExplosionDelay>k__BackingField: 0.5
   explosionVfx: {fileID: 8926484042661614526, guid: 9717a0288d705fc4097c3104a8c6363d, type: 3}
-  sprite: {fileID: 21300000, guid: d9cb718e260805c4d84d8329e02718c9, type: 3}
+  sprite: {fileID: 21300000, guid: 28bfd4ba03d371e49ac8dd41f719775e, type: 3}
   references:
     version: 2
     RefIds:
-    - rid: 3997121813936603217
-      type: {class: SameTypeExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
-      data: 
+    - rid: 3997121813936603216
+      type: {class: CircleExplosionBehaviour, ns: Match3, asm: Assembly-CSharp}
+      data:
+        radius: 2
+        delay: 0.5

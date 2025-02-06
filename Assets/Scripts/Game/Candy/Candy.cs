@@ -1,4 +1,7 @@
-﻿using O2.Grid;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using Match3.VFX;
+using O2.Grid;
 using UnityEngine;
 
 namespace Match3{
@@ -7,7 +10,9 @@ namespace Match3{
         public SpriteRenderer image;
         public bool IsExploded{ get; private set; }
         Vector3 originalScale;
-        public Match3Board Board;
+        readonly List<UniTask> explodeTaskList = new();
+
+        public M3BoardVFX vfxRunner;
 
         private void Awake(){
             originalScale = transform.localScale;
@@ -19,18 +24,22 @@ namespace Match3{
             return this;
         }
 
-        public Candy Explode(Match3Board board, GridElement<Candy> selfGridElement){
-            foreach (var candyBehaviour in scriptableCandy.candyBehaviours)
-                candyBehaviour.OnExplode(board, selfGridElement);
 
-            return ExplodeImmediate();
+        public async UniTask ExplodeAsync(Match3Board board, GridElement<Candy> selfGridElement){
+            foreach (ICandyBehaviour candyBehaviour in scriptableCandy.candyBehaviours)
+                explodeTaskList.Add(candyBehaviour.OnExplodeTask(board, selfGridElement));
+
+            await UniTask.WhenAll(explodeTaskList);
+            ExplodeImmediate();
+            explodeTaskList.Clear();
         }
 
-        public Candy ExplodeImmediate(bool internalCall = false){
-            if (internalCall){
-                Board.m3BoardVFX.DirectExplode(this);
+        public Candy ExplodeImmediate(){
+            if (IsExploded){
+                return this;
             }
 
+            vfxRunner.PlayVfx(scriptableCandy.explosionVfx, transform.position, scriptableCandy.ExplosionDelay);
             gameObject.SetActive(false);
             transform.localScale = originalScale;
             IsExploded = true;
@@ -39,6 +48,7 @@ namespace Match3{
 
 
         public Candy ReActivate(){
+            transform.localScale = originalScale;
             gameObject.SetActive(true);
             IsExploded = false;
             return this;

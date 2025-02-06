@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Balloon - Red
   m_EditorClassIdentifier: 
   candyBehaviours: []
+  <ExplosionDelay>k__BackingField: 0.5
   explosionVfx: {fileID: 8926484042661614526, guid: 9717a0288d705fc4097c3104a8c6363d, type: 3}
   sprite: {fileID: 21300000, guid: 5626a4dfebb76d647b4b9fb0499a1130, type: 3}
   references:
