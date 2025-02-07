@@ -10,10 +10,11 @@ namespace Match3{
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class ActiveGameBoard<T> : GameBoardBase{
-        [SerializeField, TabGroup("Validation Options")] protected bool checkNeighbours = true;
-
         // The grid that represents the game board.
-        public Grid<T> grid{ get; private set; }
+        public Grid<T> _grid{ get; private set; }
+        public override WorldGrid Grid => _grid;
+
+        [SerializeField, TabGroup("Validation Options")] protected bool checkNeighbours = true;
 
         /// <summary>
         /// Validators to validate the move action.
@@ -27,16 +28,17 @@ namespace Match3{
         /// <param name="secondGridElement"></param>
         protected abstract void ExecuteValidatedMove(GridElement<T> firstGridElement, GridElement<T> secondGridElement);
 
+
         public override void ExecuteMove(SwipeActionData swipeActionData){
             if (_boardMoveActionValidators != null)
-                if (_boardMoveActionValidators.Any(validator => !validator.ValidateMoveAction(grid, swipeActionData)))
+                if (_boardMoveActionValidators.Any(validator => !validator.ValidateMoveAction(_grid, swipeActionData)))
                     return;
 
             GridElement<T> firstGridElement =
-                grid.GetGridElementWithWorldPosition(swipeActionData.startPositionScreenToWorld);
+                _grid.GetGridElementWithWorldPosition(swipeActionData.startPositionScreenToWorld);
 
             GridElement<T> secondGridElement =
-                grid.GetGridElementAt(firstGridElement.Index + swipeActionData.DesignatedDirection);
+                _grid.GetGridElementAt(firstGridElement.Index + swipeActionData.DesignatedDirection);
 
 
             if (!secondGridElement.IsFilled)
@@ -55,7 +57,7 @@ namespace Match3{
         }
 
         private void Awake(){
-            grid = new Grid<T>(width, height, cellSize, origin);
+            _grid = new Grid<T>(gridData);
             OnAwake();
         }
     }

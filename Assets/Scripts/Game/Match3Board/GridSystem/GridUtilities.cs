@@ -29,8 +29,8 @@ namespace O2.Grid{
         {
             matches.Clear(); 
 
-            var width = grid.width;
-            var height = grid.height;
+            var width = grid.gridData.width;
+            var height = grid.gridData.height;
 
             for (var i = 0; i < width * height; i++)
             {

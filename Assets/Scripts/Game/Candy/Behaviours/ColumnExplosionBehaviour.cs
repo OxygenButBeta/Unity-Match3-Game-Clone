@@ -10,8 +10,8 @@ namespace Match3{
         public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
             // Explode the row
             Vector2Int gridPos = selfGridElement;
-            for (var y = 0; y < board.grid.height; y++){
-                GridElement<Candy> element = board.grid.GetGridElementAt(gridPos.x, y);
+            for (var y = 0; y < board._grid.gridData.height; y++){
+                GridElement<Candy> element = board._grid.GetGridElementAt(gridPos.x, y);
 
               
                 if (element.Index == gridPos){

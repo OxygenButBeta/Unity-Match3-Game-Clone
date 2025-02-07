@@ -9,10 +9,10 @@ namespace Match3{
         public UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
             for (int i = 0; i < maxExplosions; i++){
                 {
-                    var x = Random.Range(0, board.grid.width);
-                    var y = Random.Range(0, board.grid.height);
+                    var x = Random.Range(0, board._grid.gridData.width);
+                    var y = Random.Range(0, board._grid.gridData.height);
 
-                    if (!board.grid.TryToGetGridElementAt(new(x, y), out var element)){
+                    if (!board._grid.TryToGetGridElementAt(new(x, y), out var element)){
                         maxExplosions++;
                         continue;
                     }

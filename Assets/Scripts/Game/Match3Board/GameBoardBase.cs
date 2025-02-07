@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using System.Diagnostics.CodeAnalysis;
+using O2.Grid;
 using UnityEngine;
 
 namespace Match3{
@@ -6,21 +7,13 @@ namespace Match3{
     /// Base class for game boards.
     /// Created to use serialization and polymorphism.
     /// </summary>
+    [SuppressMessage("ReSharper", "PossibleLossOfFraction")]
     public abstract class GameBoardBase : MonoBehaviour{
-        [field: SerializeField, TabGroup("Grid Options"), Tooltip("Width of the grid")]
-        protected int width{ get; private set; }
+        public abstract WorldGrid Grid { get; }
+        [field: SerializeField] public GridData gridData{ get; private set; }
 
-        [field: SerializeField, TabGroup("Grid Options"), Tooltip("Height of the grid")]
-        protected int height{ get; private set; }
-
-        [field: SerializeField, TabGroup("Grid Options"), Tooltip("Size of the cell")]
-        protected float cellSize{ get; private set; }
-
-        [field: SerializeField, TabGroup("Grid Options"), Tooltip("Origin of the grid")]
-        protected Vector2 origin{ get; private set; }
-
-        // ReSharper disable once PossibleLossOfFraction
-        public Vector2 GetWorldCenter() => new Vector3(width / 2, height / 2) * cellSize + (Vector3)origin;
+        public Vector2 GetWorldCenter() => new Vector3(gridData.width / 2, gridData.height / 2) * gridData.cellSize +
+                                           gridData.origin;
 
         /// <summary>
         /// The method that will be called when a move is executed.
@@ -29,5 +22,6 @@ namespace Match3{
         public virtual void ExecuteMove(SwipeActionData swipeActionData){
             // This method will be overridden by the child classes.
         }
+
     }
 }

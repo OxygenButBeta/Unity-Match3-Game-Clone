@@ -11,7 +11,7 @@ namespace Match3{
             NativeList<Vector3> positions = new(2, Allocator.Persistent);
             positions.Add(selfGridElement.Item.transform.position);
 
-            foreach (var element in board.grid.IterateAll()){
+            foreach (var element in board._grid.IterateAll()){
                 if (element.Index == selfGridElement.Index)
                     continue;
 

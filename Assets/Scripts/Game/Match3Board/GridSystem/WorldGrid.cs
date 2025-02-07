@@ -6,22 +6,8 @@ namespace O2.Grid{
     /// It provides methods to convert between world space and grid space.
     /// </summary>
     public class WorldGrid{
-        // The width and height of the grid.
-        public readonly int width;
-        public readonly int height;
-
-        // The size of each cell in the grid.
-        readonly float cellSize;
-
-        // The origin of the grid.
-        readonly Vector3 origin;
-
-        protected WorldGrid(int width, int height, float cellSize, Vector3 origin){
-            this.width = width;
-            this.height = height;
-            this.cellSize = cellSize;
-            this.origin = origin;
-        }
+        public readonly GridData gridData;
+        public WorldGrid(GridData gridData) => this.gridData = gridData;
 
         /// <summary>
         /// Returns the world position of the cell at the given index.
@@ -30,7 +16,7 @@ namespace O2.Grid{
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public Vector3 GetWorldPosition(int x, int y) => new Vector3(x, y) * cellSize + origin;
+        public Vector3 GetWorldPosition(int x, int y) => new Vector3(x, y) * gridData.cellSize +  gridData.origin;
 
         /// <summary>
         /// Returns the world position of the cell at the given index.
@@ -47,7 +33,7 @@ namespace O2.Grid{
         /// <param name="index"></param>
         /// <returns></returns>
         public virtual bool IsIndexWithinBounds(Vector2Int index) =>
-            index.x >= 0 && index.y >= 0 && index.x < width && index.y < height;
+            index.x >= 0 && index.y >= 0 && index.x <  gridData.width && index.y <  gridData.height;
 
         /// <summary>
         /// Converts the given world position to grid space.
@@ -61,22 +47,35 @@ namespace O2.Grid{
             return IsIndexWithinBounds(elementIndex);
         }
 
+        /// <summary>
+        /// Checks if the element exists in the given world position.
+        /// </summary>
+        /// <param name="worldPosition"></param>
+        /// <returns></returns>
         public bool IsElementExistInWorldPosition(Vector3 worldPosition){
             return IsIndexWithinBounds(GetElementIndexFromWorldPosition(worldPosition));
         }
 
+        /// <summary>
+        /// This method converts the given world position to grid space.
+        /// </summary>
+        /// <param name="worldPosition"></param>
+        /// <returns></returns>
         public  Vector2Int GetElementIndexFromWorldPosition(Vector3 worldPosition){
-            Vector3 localPos = worldPosition - origin;
-            var x = Mathf.RoundToInt(localPos.x / cellSize);
-            var y = Mathf.RoundToInt(localPos.y / cellSize);
+            Vector3 localPos = worldPosition -  gridData.origin;
+            var x = Mathf.RoundToInt(localPos.x /  gridData.cellSize);
+            var y = Mathf.RoundToInt(localPos.y /  gridData.cellSize);
             return new Vector2Int(x, y);
         }
         
+        /// <summary>
+        /// Returns the center index of the grid.
+        /// </summary>
+        /// <returns></returns>
         public Vector2Int GetGridCenterIndex()
         {
-            var centerX = Mathf.FloorToInt((width - 1) / 2f);
-            var centerY = Mathf.FloorToInt((height - 1) / 2f);
-
+            var centerX = Mathf.FloorToInt(( gridData.width - 1) / 2f);
+            var centerY = Mathf.FloorToInt(( gridData.height - 1) / 2f);
             return new Vector2Int(centerX, centerY);
         }
     }

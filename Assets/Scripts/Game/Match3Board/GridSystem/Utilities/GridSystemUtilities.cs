@@ -35,7 +35,7 @@ namespace O2.Grid{
                         break;
 
                     // bottom right diagonal
-                    if (fallToIndex.x + 1 < grid.width){
+                    if (fallToIndex.x + 1 < grid.gridData.width){
                         GridElement<T> rightDiagonal = grid.gridArray[fallToIndex.x + 1, fallToIndex.y - 1];
                         if (!rightDiagonal.IsFilled){
                             fallToIndex = rightDiagonal.Index;

@@ -574,11 +574,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf0d1116088e2943b5100d9f2741005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <width>k__BackingField: 5
-  <height>k__BackingField: 6
-  <cellSize>k__BackingField: 0.7
-  <origin>k__BackingField: {x: 0, y: 0}
   blankPrefab: {fileID: 8374404814352255079, guid: a33d68ecee9a7464f84999a19c6874c5, type: 3}
+  targetBoard: {fileID: 965410004}
 --- !u!4 &645238817
 Transform:
   m_ObjectHideFlags: 0
@@ -754,21 +751,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5c304de505b43c693b79c377b227c6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <width>k__BackingField: 5
-  <height>k__BackingField: 6
-  <cellSize>k__BackingField: 0.7
-  <origin>k__BackingField: {x: 0, y: 0}
+  <gridData>k__BackingField:
+    <width>k__BackingField: 5
+    <height>k__BackingField: 6
+    <cellSize>k__BackingField: 0.6
+    <origin>k__BackingField: {x: 0, y: 0, z: 0}
   checkNeighbours: 1
   _boardMoveActionValidators:
   - rid: 7478115733003305032
-  scriptableCandies:
-  - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
-  - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
-  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
-  - {fileID: 11400000, guid: 90bbe1218f5cebc42bf1c8c938e6b97c, type: 2}
-  - {fileID: 11400000, guid: 09f16cdc7cf391f4ca9732273547da0f, type: 2}
-  - {fileID: 11400000, guid: a7a96a03e31e6fa40a0d79d081ef6a39, type: 2}
-  prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
   fallDuration: 0.5
   allow2x2Matches: 1
   fallDiagonal: 0
@@ -777,7 +767,15 @@ MonoBehaviour:
   fallDurationDelay: 0.3
   fallMag: 0.05
   afterExplosionDelay: 0.5
+  scriptableCandies:
+  - {fileID: 11400000, guid: 44721742336e123468970221c89a9367, type: 2}
+  - {fileID: 11400000, guid: 702b2eefe2b83c64bbb67f953c6b8683, type: 2}
+  - {fileID: 11400000, guid: a23b62a49cbabc643b12abca3579dead, type: 2}
+  - {fileID: 11400000, guid: 90bbe1218f5cebc42bf1c8c938e6b97c, type: 2}
+  - {fileID: 11400000, guid: 09f16cdc7cf391f4ca9732273547da0f, type: 2}
+  - {fileID: 11400000, guid: a7a96a03e31e6fa40a0d79d081ef6a39, type: 2}
   m3BoardVFX: {fileID: 965410007}
+  prefab: {fileID: -101349624480010457, guid: 3c6f669d93f2ea24bab64bf8e2dbb0b8, type: 3}
   references:
     version: 2
     RefIds:

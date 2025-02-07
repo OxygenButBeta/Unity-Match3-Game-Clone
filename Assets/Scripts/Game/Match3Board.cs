@@ -1,30 +1,29 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using Match3.VFX;
 using O2.Grid;
-using Sirenix.OdinInspector;
+using Match3.VFX;
+using System.Linq;
+using DG.Tweening;
 using UnityEngine;
+using Sirenix.OdinInspector;
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
 namespace Match3{
     public class Match3Board : ActiveGameBoard<Candy>{
         public event Action<GridElement<Candy>, GridElement<Candy>> OnCandySwap;
 
-        [SerializeField] ScriptableCandy[] scriptableCandies;
-        [SerializeField] Candy prefab;
         [SerializeField, TabGroup("Game Options")] float fallDuration = 0.5f;
         [SerializeField, TabGroup("Game Options")] bool allow2x2Matches;
         [SerializeField, TabGroup("Game Options")] bool fallDiagonal;
         [SerializeField, TabGroup("Game Options")] bool spawnNewCandies;
-
         [SerializeField, TabGroup("Game Options")] private float fallOffset;
         [SerializeField, TabGroup("Game Options")] private float fallDurationDelay;
         [SerializeField, TabGroup("Game Options")] float fallMag = 0.05f;
         [SerializeField, TabGroup("Visual")] float afterExplosionDelay = 0.5f;
+        [SerializeField] ScriptableCandy[] scriptableCandies;
         [SerializeField] M3BoardVFX m3BoardVFX;
+        [SerializeField] Candy prefab;
 
         GridGravityOptions<Candy> gridGravityOptions;
         readonly CandyEqualityComparer equalityComparer = new();
@@ -35,18 +34,16 @@ namespace Match3{
         readonly HashSet<Vector2Int> matches = new();
 
 
-        ScriptableCandy GetRandomCandySO() => scriptableCandies[Random.Range(0, scriptableCandies.Length)];
-
         protected override void OnAwake(){
-            foreach (GridElement<Candy> element in grid.IterateAll()){
-                element.Item = Instantiate(prefab, grid.GetWorldPosition(element), Quaternion.identity, transform)
+            foreach (GridElement<Candy> element in _grid.IterateAll()){
+                element.Item = Instantiate(prefab, _grid.GetWorldPosition(element), Quaternion.identity, transform)
                     .SetScriptableCandy(GetRandomCandySO());
                 element.Item.vfxRunner = m3BoardVFX;
             }
 
             gridGravityOptions = new GridGravityOptions<Candy>(
                 (element) => element.Item.IsExploded,
-                (element) => element.Item.transform.DOMove(grid.GetWorldPosition(element), fallDuration)
+                (element) => element.Item.transform.DOMove(_grid.GetWorldPosition(element), fallDuration)
                     .SetEase(Ease.OutBack), fallDiagonal);
 
             moveOnProcess = true;
@@ -63,16 +60,15 @@ namespace Match3{
             ExecuteSwipe(firstGridElement, secondGridElement).Forget();
         }
 
-
         async UniTaskVoid ExecuteSwipe(GridElement<Candy> firstGridElement, GridElement<Candy> secondGridElement){
             // Swap the values and Swap in the visual
             await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
-            grid.SwapValues(firstGridElement, secondGridElement);
+            _grid.SwapValues(firstGridElement, secondGridElement);
 
             // Swap back if no match
-            if (!grid.FindMatches(in matches, equalityComparer, allow2x2Matches)){
+            if (!_grid.FindMatches(in matches, equalityComparer, allow2x2Matches)){
                 await VisualGridUtilities.SwapWorldPosition(firstGridElement, secondGridElement);
-                grid.SwapValues(firstGridElement, secondGridElement);
+                _grid.SwapValues(firstGridElement, secondGridElement);
                 moveOnProcess = false;
                 return;
             }
@@ -82,7 +78,7 @@ namespace Match3{
 
         async UniTask ProcessMatches(){
             while (true){
-                if (!grid.FindMatches(matches, equalityComparer, allow2x2Matches))
+                if (!_grid.FindMatches(matches, equalityComparer, allow2x2Matches))
                     break; // No more matches
 
                 await ExplodeMatches();
@@ -91,7 +87,7 @@ namespace Match3{
                                          (afterExplosionDelay / 3)));
 
                 // Gravity Simulation
-                if (GridSystemUtilities.SimulateGravity(grid, gridGravityOptions))
+                if (GridSystemUtilities.SimulateGravity(_grid, gridGravityOptions))
                     await UniTask.Delay(Convert.ToInt32(fallDuration * 1000));
                 // Wait for the fall to finish
 
@@ -104,13 +100,13 @@ namespace Match3{
 
         private async UniTask SpawnNewCandies(){
             var iterationCount = 0;
-            foreach (GridElement<Candy> element in grid.IterateAll(true)){
+            foreach (GridElement<Candy> element in _grid.IterateAll(true)){
                 if (!element.Item.IsExploded)
                     continue;
 
                 iterationCount++;
                 element.IsFilled = true;
-                Vector3 pos = grid.GetWorldPosition(element);
+                Vector3 pos = _grid.GetWorldPosition(element);
                 element.Item
                     .SetScriptableCandy(GetRandomCandySO())
                     .ReActivate()
@@ -132,7 +128,7 @@ namespace Match3{
         }
 
         async UniTask ExplodeMatches(){
-            GridElement<Candy>[] elementsToExplode = grid.GetGridElements(matches).ToArray();
+            GridElement<Candy>[] elementsToExplode = _grid.GetGridElements(matches).ToArray();
             foreach (GridElement<Candy> gridItem in elementsToExplode){
                 // Don't explode static items
                 if (gridItem.Item.IsExploded)
@@ -143,5 +139,7 @@ namespace Match3{
                 gridItem.IsFilled = false;
             }
         }
+
+        ScriptableCandy GetRandomCandySO() => scriptableCandies[Random.Range(0, scriptableCandies.Length)];
     }
 }

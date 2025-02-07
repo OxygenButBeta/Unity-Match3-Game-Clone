@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using O2.Extensions;
-using UnityEngine;
+using System.Collections.Generic;
 
 namespace O2.Grid{
     /// <summary>
@@ -15,10 +15,10 @@ namespace O2.Grid{
         internal readonly GridElement<T>[,] gridArray;
 
         //Constructor
-        public Grid(int width, int height, float cellSize, Vector3 origin) : base(width, height, cellSize, origin){
-            gridArray = new GridElement<T>[width, height];
-            for (var x = 0; x < width; x++)
-            for (var y = 0; y < height; y++)
+        public Grid(GridData gridData) : base(gridData){
+            gridArray = new GridElement<T>[gridData.width, gridData.height];
+            for (var x = 0; x < gridData.width; x++)
+            for (var y = 0; y < gridData.height; y++)
                 gridArray[x, y] = new GridElement<T>(x, y);
         }
 
@@ -102,12 +102,12 @@ namespace O2.Grid{
         /// <param name="includeStatics"></param>
         /// <returns></returns>
         public IEnumerable<GridElement<T>> IterateAll(bool includeStatics = true){
-            for (var x = 0; x < width; x++)
-            for (var y = 0; y < height; y++){
+            for (var x = 0; x < gridData.width; x++)
+            for (var y = 0; y < gridData.height; y++){
                 if (includeStatics)
                     yield return GetGridElementAt(x, y);
                 else{
-                    var temp = GetGridElementAt(x, y);
+                    GridElement<T> temp = GetGridElementAt(x, y);
                     if (!temp.IsStatic)
                         yield return temp;
                 }

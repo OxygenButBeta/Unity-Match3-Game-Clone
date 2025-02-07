@@ -10,8 +10,8 @@ namespace Match3{
         public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
             // Explode the row 
             Vector2Int gridPos = selfGridElement;
-            for (var x = 0; x < board.grid.width; x++){
-                GridElement<Candy> element = board.grid.GetGridElementAt(x, gridPos.y);
+            for (var x = 0; x < board._grid.gridData.width; x++){
+                GridElement<Candy> element = board._grid.GetGridElementAt(x, gridPos.y);
 
                 if (element.Index == gridPos){
                     element.Item.transform.DOScale(Vector3.one * .75f, delay);

@@ -14,13 +14,13 @@ namespace Match3{
             for (var y = -radius; y <= radius; y++){
                 Vector2Int targetPos = gridPos + new Vector2Int(x, y);
 
-                if (!board.grid.IsIndexWithinBounds(targetPos))
+                if (!board._grid.IsIndexWithinBounds(targetPos))
                     continue;
 
                 if (!(Vector2Int.Distance(gridPos, targetPos) <= radius))
                     continue;
 
-                GridElement<Candy> element = board.grid.GetGridElementAt(targetPos.x, targetPos.y);
+                GridElement<Candy> element = board._grid.GetGridElementAt(targetPos.x, targetPos.y);
                 if (element.Index == gridPos)
                     continue;
 
