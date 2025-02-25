@@ -7,30 +7,30 @@ namespace Match3{
     public class CircleExplosionBehaviour : ICandyBehaviour{
         [SerializeField] int radius = 1;
         [SerializeField] private float delay;
-        public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
-            Vector2Int gridPos = selfGridElement.Index;
 
+        public async UniTask OnExplodeTask(Match3Board board, GridNode<Candy> selfGridNode){
+            Vector2Int gridPos = selfGridNode.Index;
             for (var x = -radius; x <= radius; x++)
             for (var y = -radius; y <= radius; y++){
                 Vector2Int targetPos = gridPos + new Vector2Int(x, y);
 
-                if (!board._grid.IsIndexWithinBounds(targetPos))
+                if (!board.Grid.IsIndexWithinBounds(targetPos))
                     continue;
 
                 if (!(Vector2Int.Distance(gridPos, targetPos) <= radius))
                     continue;
 
-                GridElement<Candy> element = board._grid.GetGridElementAt(targetPos.x, targetPos.y);
-                if (element.Index == gridPos)
+                GridNode<Candy> node = board.Grid.GetGridElementAt(targetPos.x, targetPos.y);
+                if (node.Index == gridPos)
                     continue;
 
-                if (element.Item.IsExploded)
+                if (node.Item.IsExploded)
                     continue;
 
-                element.Item.transform.DOShakeRotation(delay, 90, 20, 90).onComplete =
+                node.Item.transform.DOShakeRotation(delay, 90, 20, 90).onComplete =
                     () => {
-                        element.IsFilled = false;
-                        element.Item.ExplodeImmediate();
+                        node.IsFilled = false;
+                        node.Item.ExplodeImmediate();
                     };
             }
 

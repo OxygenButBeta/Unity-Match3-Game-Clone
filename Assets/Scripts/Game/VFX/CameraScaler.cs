@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace Match3.VFX{
     public class CameraScaler : MonoBehaviour{
-        [SerializeField] Camera _camera;
-        [SerializeField] GameBoardBase gameBoardBase;
-
+        [SerializeField,Required] Camera _camera;
+        [SerializeField,Required] GameBoardBase gameBoardBase;
         [SerializeField] float offset;
 
         private void Reset(){

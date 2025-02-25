@@ -7,29 +7,29 @@ namespace Match3{
     public class RowExplosionBehaviour : ICandyBehaviour{
         [SerializeField] private float delay = .5f;
 
-        public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
+        public async UniTask OnExplodeTask(Match3Board board, GridNode<Candy> selfGridNode){
             // Explode the row 
-            Vector2Int gridPos = selfGridElement;
-            for (var x = 0; x < board._grid.gridData.width; x++){
-                GridElement<Candy> element = board._grid.GetGridElementAt(x, gridPos.y);
+            Vector2Int gridPos = selfGridNode;
+            for (var x = 0; x < board.Grid.gridData.width; x++){
+                GridNode<Candy> node = board.Grid.GetGridElementAt(x, gridPos.y);
 
-                if (element.Index == gridPos){
-                    element.Item.transform.DOScale(Vector3.one * .75f, delay);
+                if (node.Index == gridPos){
+                    node.Item.transform.DOScale(Vector3.one * .75f, delay);
                     continue;
                 }
 
                 Sequence sequence = DOTween.Sequence();
 
-                if (!element.Item.IsExploded){
-                    sequence.Append(element.Item.transform.DOScale(Vector3.one * .75f, delay)).Join(
-                        element.Item.transform.DOShakeRotation(
+                if (!node.Item.IsExploded){
+                    sequence.Append(node.Item.transform.DOScale(Vector3.one * .75f, delay)).Join(
+                        node.Item.transform.DOShakeRotation(
                             duration: delay,
                             strength: new Vector3(0, 0, 10),
                             vibrato: 10,
                             fadeOut: false
                         )).onComplete = () => {
-                        element.IsFilled = false;
-                        element.Item.ExplodeImmediate();
+                        node.IsFilled = false;
+                        node.Item.ExplodeImmediate();
                     };
                 }
             }

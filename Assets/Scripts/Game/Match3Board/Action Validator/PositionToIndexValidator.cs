@@ -7,8 +7,8 @@ namespace Match3{
     /// It checks if the move is valid and returns the indices of the elements that will be moved.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class PositionToIndexValidator : IBoardMoveActionValidator{
-        public bool ValidateMoveAction(WorldGrid grid, SwipeActionData swipeActionData){
+    public class PositionToIndexValidator : ISwipeActionValidator{
+        public bool ValidateSwapAction(WorldGrid grid, SwipeActionData swipeActionData){
             
             // Check if the move is valid
             if (swipeActionData.DesignatedDirection == Vector2Int.zero)

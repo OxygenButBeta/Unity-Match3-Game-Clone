@@ -7,28 +7,28 @@ namespace O2.Grid{
 
             for (var x = 0; x < grid.gridArray.GetLength(0); x++)
             for (var y = 0; y < grid.gridArray.GetLength(1); y++){
-                GridElement<T> element = grid.gridArray[x, y];
-                if (element.IsStatic || gridGravityOptions.CellFallCondition(element))
+                GridNode<T> node = grid.gridArray[x, y];
+                if (node.IsStatic || gridGravityOptions.CellFallCondition(node))
                     continue;
 
-                Vector2Int fallToIndex = FindFallDestination(grid, element, gridGravityOptions);
-                if (fallToIndex == element.Index)
+                Vector2Int fallToIndex = FindFallDestination(grid, node, gridGravityOptions);
+                if (fallToIndex == node.Index)
                     continue;
 
                 hasFallen = true;
-                grid.SwapValues(element, grid.GetGridElementAt(fallToIndex));
-                gridGravityOptions.onCellFallAction(element);
+                grid.SwapValues(node, grid.GetGridElementAt(fallToIndex));
+                gridGravityOptions.onCellFallAction(node);
             }
 
             return hasFallen;
         }
 
-        private static Vector2Int FindFallDestination<T>(Grid<T> grid, GridElement<T> element,
+        private static Vector2Int FindFallDestination<T>(Grid<T> grid, GridNode<T> node,
             GridGravityOptions<T> gridGravityOptions){
-            Vector2Int fallToIndex = element.Index;
+            Vector2Int fallToIndex = node.Index;
 
             while (fallToIndex.y > 0){
-                GridElement<T> below = grid.gridArray[element.Index.x, fallToIndex.y - 1];
+                GridNode<T> below = grid.gridArray[node.Index.x, fallToIndex.y - 1];
 
                 if (below.IsFilled){
                     if (!gridGravityOptions.FallDiagonal)
@@ -36,7 +36,7 @@ namespace O2.Grid{
 
                     // bottom right diagonal
                     if (fallToIndex.x + 1 < grid.gridData.width){
-                        GridElement<T> rightDiagonal = grid.gridArray[fallToIndex.x + 1, fallToIndex.y - 1];
+                        GridNode<T> rightDiagonal = grid.gridArray[fallToIndex.x + 1, fallToIndex.y - 1];
                         if (!rightDiagonal.IsFilled){
                             fallToIndex = rightDiagonal.Index;
                             continue;
@@ -45,7 +45,7 @@ namespace O2.Grid{
 
                     // bottom left diagonal
                     if (fallToIndex.x - 1 >= 0){
-                        GridElement<T> leftDiagonal = grid.gridArray[fallToIndex.x - 1, fallToIndex.y - 1];
+                        GridNode<T> leftDiagonal = grid.gridArray[fallToIndex.x - 1, fallToIndex.y - 1];
                         if (!leftDiagonal.IsFilled){
                             fallToIndex = leftDiagonal.Index;
                             continue;
@@ -54,7 +54,6 @@ namespace O2.Grid{
 
                     break;
                 }
-
                 fallToIndex = below.Index;
             }
 

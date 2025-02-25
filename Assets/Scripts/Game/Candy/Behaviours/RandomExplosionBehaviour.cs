@@ -6,23 +6,23 @@ namespace Match3{
     public class RandomExplosionBehaviour : ICandyBehaviour{
         [SerializeField] int maxExplosions = 6;
         
-        public UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
+        public UniTask OnExplodeTask(Match3Board board, GridNode<Candy> selfGridNode){
             for (int i = 0; i < maxExplosions; i++){
                 {
-                    var x = Random.Range(0, board._grid.gridData.width);
-                    var y = Random.Range(0, board._grid.gridData.height);
+                    var x = Random.Range(0, board.Grid.gridData.width);
+                    var y = Random.Range(0, board.Grid.gridData.height);
 
-                    if (!board._grid.TryToGetGridElementAt(new(x, y), out var element)){
+                    if (!board.Grid.TryToGetGridElementAt(new(x, y), out var element)){
                         maxExplosions++;
                         continue;
                     }
 
 
-                    if (element.Index == selfGridElement.Index)
+                    if (element.Index == selfGridNode.Index)
                         continue;
 
 
-                    if (!element.Item.scriptableCandy.Equals(selfGridElement.Item.scriptableCandy)){
+                    if (!element.Item.scriptableCandy.Equals(selfGridNode.Item.scriptableCandy)){
                         if (!element.Item.IsExploded){
                             element.IsFilled = false;
                             element.Item.ExplodeImmediate();

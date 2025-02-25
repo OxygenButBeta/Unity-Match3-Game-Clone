@@ -1,4 +1,3 @@
-using System;
 using DG.Tweening;
 using Match3;
 using O2.Grid;
@@ -6,7 +5,6 @@ using TMPro;
 using UnityEngine;
 
 public class UIManager : MonoBehaviour{
-    public static UIManager Instance;
     [SerializeField] private Match3Board board;
     [SerializeField] TMP_Text remainingMovesText;
     [SerializeField] TMP_Text doneText;
@@ -55,14 +53,15 @@ public class UIManager : MonoBehaviour{
             levelCompletePanel0.DOAnchorPosY(-2000, 3f).SetDelay(3f);
         };
         levelCompletePanel1.DOAnchorPosY(origin1.y, 1.8f).onComplete = () => {
-            levelCompletePanel1.DOAnchorPosY(-2000, 1.8f).SetDelay(3f);
+            levelCompletePanel1.DOAnchorPosY(-2000, 3f).SetDelay(3f);
         };
         levelCompletePanel2.DOAnchorPosY(origin2.y, 1.9f).onComplete = () => {
-            levelCompletePanel2.DOAnchorPosY(-2000, 1.9f).SetDelay(3f);
+            levelCompletePanel2.DOAnchorPosY(-2000, 3f).SetDelay(3f);
         };
     }
 
-    private void UpdateRemainingMoves(GridElement<Candy> arg1, GridElement<Candy> arg2){
+    private void UpdateRemainingMoves(GridNode<Candy> arg1, GridNode<Candy> arg2){
+        Debug.Log("Move Count : " + MoveCount);
         MoveCount--;
         if (MoveCount == 5){
             doneText.text = "Be careful! You have only 5 moves left!";

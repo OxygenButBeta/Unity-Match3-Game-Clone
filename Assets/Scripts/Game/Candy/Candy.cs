@@ -24,10 +24,9 @@ namespace Match3{
             return this;
         }
 
-
-        public async UniTask ExplodeAsync(Match3Board board, GridElement<Candy> selfGridElement){
+        public async UniTask ExplodeAsync(Match3Board board, GridNode<Candy> selfGridNode){
             foreach (ICandyBehaviour candyBehaviour in scriptableCandy.candyBehaviours)
-                explodeTaskList.Add(candyBehaviour.OnExplodeTask(board, selfGridElement));
+                explodeTaskList.Add(candyBehaviour.OnExplodeTask(board, selfGridNode));
 
             await UniTask.WhenAll(explodeTaskList);
             ExplodeImmediate();
@@ -39,7 +38,7 @@ namespace Match3{
                 return this;
             }
 
-            vfxRunner.PlayVfx(scriptableCandy.explosionVfx, transform.position, scriptableCandy.ExplosionDelay);
+            vfxRunner.PlayVFX(scriptableCandy.explosionVfx, transform.position, scriptableCandy.ExplosionDelay);
             gameObject.SetActive(false);
             transform.localScale = originalScale;
             IsExploded = true;

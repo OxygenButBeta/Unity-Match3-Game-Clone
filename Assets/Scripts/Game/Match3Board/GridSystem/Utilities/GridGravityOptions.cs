@@ -5,17 +5,18 @@ namespace O2.Grid{
         /// <summary>
         /// This predicate will be used to determine if a cell should fall or not.
         /// </summary>
-        public readonly Predicate<GridElement<T>> CellFallCondition;
-        
+        public readonly Predicate<GridNode<T>> CellFallCondition;
+
         /// <summary>
         /// This action will be called when a cell falls.
         /// </summary>
-        public readonly Action<GridElement<T>> onCellFallAction;
+        public readonly Action<GridNode<T>> onCellFallAction;
 
         public readonly bool FallDiagonal;
 
-        public GridGravityOptions( Predicate<GridElement<T>> cellFallCondition, Action<GridElement<T>> onCellFallAction, bool fallDiagonal){
-            this.CellFallCondition = cellFallCondition;
+        public GridGravityOptions(Predicate<GridNode<T>> cellFallCondition, Action<GridNode<T>> onCellFallAction,
+            bool fallDiagonal){
+            CellFallCondition = cellFallCondition;
             this.onCellFallAction = onCellFallAction;
             FallDiagonal = fallDiagonal;
         }

@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using O2.Grid;
 using UnityEngine;
@@ -7,27 +8,30 @@ namespace Match3{
     public class ColumnExplosionBehaviour : ICandyBehaviour{
         [SerializeField] private float delay;
 
-        public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
-            // Explode the row
-            Vector2Int gridPos = selfGridElement;
-            for (var y = 0; y < board._grid.gridData.height; y++){
-                GridElement<Candy> element = board._grid.GetGridElementAt(gridPos.x, y);
+        readonly List<UniTask> tasks = new();
 
-              
-                if (element.Index == gridPos){
-                    element.Item.transform.DOScale(Vector3.one * .75f, delay);
+        public async UniTask OnExplodeTask(Match3Board board, GridNode<Candy> selfGridNode){
+            // Explode the row
+            Vector2Int gridPos = selfGridNode;
+            for (var y = 0; y < board.Grid.gridData.height; y++){
+                GridNode<Candy> node = board.Grid.GetGridElementAt(gridPos.x, y);
+
+
+                if (node.Index == gridPos){
+                    node.Item.transform.DOScale(Vector3.one * .75f, delay);
                     continue;
                 }
 
-                if (!element.Item.IsExploded){
-                    element.Item.transform.DOScale(Vector3.one * .75f, delay).onComplete = () => {
-                        element.IsFilled = false;
-                        element.Item.ExplodeImmediate();
+                if (!node.Item.IsExploded){
+                    node.Item.transform.DOScale(Vector3.one * .75f, delay).onComplete = () => {
+                        node.IsFilled = false;
+                        tasks.Add(node.Item.ExplodeAsync(board, selfGridNode));
                     };
                 }
             }
 
-            await UniTask.WaitForSeconds(delay);
+            tasks.Add(UniTask.WaitForSeconds(delay));
+            await UniTask.WhenAll(tasks);
         }
     }
 }

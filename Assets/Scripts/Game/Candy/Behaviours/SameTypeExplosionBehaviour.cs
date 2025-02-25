@@ -6,16 +6,16 @@ using UnityEngine;
 
 namespace Match3{
     public class SameTypeExplosionBehaviour : ICandyBehaviour{
-        public async UniTask OnExplodeTask(Match3Board board, GridElement<Candy> selfGridElement){
+        public async UniTask OnExplodeTask(Match3Board board, GridNode<Candy> selfGridNode){
             var renderer = Object.FindAnyObjectByType<LineRenderer>();
             NativeList<Vector3> positions = new(2, Allocator.Persistent);
-            positions.Add(selfGridElement.Item.transform.position);
+            positions.Add(selfGridNode.Item.transform.position);
 
-            foreach (var element in board._grid.IterateAll()){
-                if (element.Index == selfGridElement.Index)
+            foreach (var element in board.Grid.IterateAll()){
+                if (element.Index == selfGridNode.Index)
                     continue;
 
-                if (!element.Item.scriptableCandy.Equals(selfGridElement.Item.scriptableCandy)){
+                if (!element.Item.scriptableCandy.Equals(selfGridNode.Item.scriptableCandy)){
                     continue;
                 }
 
@@ -25,7 +25,7 @@ namespace Match3{
                         element.Item.ExplodeImmediate();
                     };
                     positions.Add(element.Item.transform.position);
-                    positions.Add(selfGridElement.Item.transform.position);
+                    positions.Add(selfGridNode.Item.transform.position);
                     renderer.positionCount = positions.Length;
                     renderer.SetPositions(positions.ToArray(Allocator.Temp));
                     await UniTask.Delay(100);
