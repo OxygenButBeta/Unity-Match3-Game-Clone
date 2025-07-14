@@ -7,6 +7,7 @@ The project explores performance optimization, maintainable architecture, and as
 
 <img width="253" height="435" alt="image" src="https://github.com/user-attachments/assets/0c69fbf4-7747-473e-b029-5f1b43317dfe" />
 <img width="253" height="435" alt="image" src="https://github.com/user-attachments/assets/26560ac1-5b75-423a-a09c-c48a9a404c80" />
+<img width="253" height="435" alt="image" src="https://github.com/user-attachments/assets/23381c60-58f7-4615-b0fb-a09c9e88b72f" />
 
 
 ---
